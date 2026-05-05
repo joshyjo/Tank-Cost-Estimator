@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tank Cost Estimator v1.2.0</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="data/materials.js"></script>
+  <script src="data/cost_rates.js"></script>
+  <script src="data/nozzle_rates.js"></script>
+  <script src="data/default_nozzle_schedule.js"></script>
+  <script src="js/calculations.js"></script>
+  <script src="data/repair_rates.js"></script>
+  <script src="js/repair/repair_calculations.js"></script>
+  <script src="js/repair/repair_output.js"></script>
+  <script src="js/repair/repair_app.js"></script>
+</head>
+<body>
+
+<header id="app-header">
+  <div class="title-block">
+    <h1>API 650 Tank Cost Estimator</h1>
+    <p>Indicative project cost estimation for aboveground atmospheric storage tanks</p>
+  </div>
+  <span id="version-badge">v1.2.0</span>
+</header>
+
+
+<div id="landing-screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 58px);background:var(--bg);gap:28px;padding:40px;">
+  <div style="text-align:center;max-width:560px;">
+    <div style="font-size:40px;margin-bottom:12px;">&#x1F3D7;</div>
+    <h2 style="font-size:22px;color:var(--primary);margin-bottom:8px;">What would you like to estimate?</h2>
+    <p style="color:var(--text-sec);font-size:14px;">Select the type of estimate to proceed.</p>
+  </div>
+  <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;">
+    <div class="landing-card" onclick="initNewBuild()">
+      <div class="landing-icon">&#x1F195;</div>
+      <div class="landing-card-title">New Tank (API 650)</div>
+      <div class="landing-card-desc">Full new-build estimate. Shell, roof, nozzles, painting, freight and more.</div>
+      <button class="btn btn-primary" style="margin-top:16px;width:100%;">Start New Build &#x2192;</button>
+    </div>
+    <div class="landing-card" onclick="initRepairModule()">
+      <div class="landing-icon">&#x1F527;</div>
+      <div class="landing-card-title">Repair / Retrofit (API 653)</div>
+      <div class="landing-card-desc">Repair or retrofit of an existing tank. IFR addition, bottom replacement, coating and more.</div>
+      <button class="btn btn-primary" style="margin-top:16px;width:100%;">Start Repair Estimate &#x2192;</button>
+    </div>
+  </div>
+</div>
+<div id="newbuild-wrapper" style="display:none;">
+<div id="app-body">
+
+<!-- ═══ SIDEBAR ═══════════════════════════════════════════════════════════════ -->
+<nav id="sidebar">
+  <ul class="step-nav">
+    <li data-step="1" class="active">
+      <div class="step-circle">1</div>
+      <div class="step-info">
+        <div class="step-label">Step 1</div>
+        <div class="step-name">Tank Geometry</div>
+      </div>
+    </li>
+    <div class="step-divider"></div>
+    <li data-step="2">
+      <div class="step-circle">2</div>
+      <div class="step-info">
+        <div class="step-label">Step 2</div>
+        <div class="step-name">Materials &amp; Design</div>
+      </div>
+    </li>
+    <div class="step-divider"></div>
+    <li data-step="3">
+      <div class="step-circle">3</div>
+      <div class="step-info">
+        <div class="step-label">Step 3</div>
+        <div class="step-name">Scope &amp; Options</div>
+      </div>
+    </li>
+    <div class="step-divider"></div>
+    <li data-step="output">
+      <div class="step-circle">✓</div>
+      <div class="step-info">
+        <div class="step-label">Output</div>
+        <div class="step-name">Cost Estimate</div>
+      </div>
+    </li>
+  </ul>
+</nav>
+
+<!-- ═══ MAIN ═══════════════════════════════════════════════════════════════════ -->
+<main id="main">
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     STEP 1 — TANK GEOMETRY
+───────────────────────────────────────────────────────────────────────────── -->
+<section id="step-1" class="step-panel active">
+  <div class="step-header">
+    <h2>Step 1 — Tank Geometry</h2>
+    <p>Define the tank dimensions, roof configuration, and operating conditions.</p>
+  </div>
+
+  <!-- Dimensions -->
+  <div class="card">
+    <div class="card-title">Dimensions</div>
+    <div class="notice info">
+      <span class="notice-icon">ℹ</span>
+      <div>Tank capacity is calculated from diameter and liquid height. Enter the nominal (inside) diameter and the maximum operating liquid level.</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="diameter">Nominal Diameter (m)</label>
+        <input type="number" id="diameter" min="1" max="120" step="0.1" placeholder="e.g. 15.0">
+        <span class="hint">Inside diameter, 1–120 m</span>
+        <span class="field-error" id="diameter-err"></span>
+      </div>
+      <div class="form-group">
+        <label for="liquidHeight">Liquid Height / Shell Height (m)</label>
+        <input type="number" id="liquidHeight" min="1" max="25" step="0.1" placeholder="e.g. 12.0">
+        <span class="hint">Maximum operating liquid level, 1–25 m</span>
+        <span class="field-error" id="liquidHeight-err"></span>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="specificGravityStep1">Design Liquid Specific Gravity (G)</label>
+        <input type="number" id="specificGravityStep1" min="0.5" max="2.5" step="0.01" value="1.00">
+        <span class="hint">Default 1.0 (water). Use actual product SG. Range 0.5–2.5.</span>
+        <span class="field-error" id="specificGravityStep1-err"></span>
+      </div>
+      <div class="form-group">
+        <label for="operatingPressure">Operating Pressure</label>
+        <select id="operatingPressure">
+          <option value="atmospheric" selected>Atmospheric (standard API 650)</option>
+          <option value="lowPressure">Low pressure (up to 2.5 kPa gauge — API 650 App. F)</option>
+        </select>
+        <span class="hint">Pressures above 2.5 kPa are outside API 650 scope.</span>
+      </div>
+    </div>
+    <div class="notice warn" id="pressure-notice" style="display:none;">
+      <span class="notice-icon">⚠</span>
+      <div>Low-pressure tanks (API 650 Appendix F) require additional shell reinforcement and a stronger roof-to-shell junction detail. A separate structural check is recommended.</div>
+    </div>
+  </div>
+
+  <!-- Outer Roof Type -->
+  <div class="card">
+    <div class="card-title">Outer Roof Type</div>
+    <p style="font-size:13px;color:var(--text-sec);margin-bottom:14px;">Select the outer (primary) roof. An Internal Floating Roof (IFR) can be added below for any fixed-roof configuration.</p>
+
+    <div class="radio-grid">
+      <label class="radio-card roof-card" data-value="coneCS">
+        <input type="radio" name="outerRoof" value="coneCS">
+        <span class="rc-icon">🔺</span>
+        <div class="rc-text"><div class="rc-title">Fixed Cone Roof</div><div class="rc-desc">Carbon Steel. Slope 1:6. Most common fixed roof type.</div></div>
+      </label>
+      <label class="radio-card roof-card" data-value="domeCS">
+        <input type="radio" name="outerRoof" value="domeCS">
+        <span class="rc-icon">🔵</span>
+        <div class="rc-text"><div class="rc-title">Fixed Dome Roof (CS)</div><div class="rc-desc">Self-supporting carbon steel dome. Larger diameters.</div></div>
+      </label>
+      <label class="radio-card roof-card" data-value="domeAL">
+        <input type="radio" name="outerRoof" value="domeAL">
+        <span class="rc-icon">✨</span>
+        <div class="rc-text"><div class="rc-title">Geodesic Dome (Aluminium)</div><div class="rc-desc">Vendor supply &amp; install. Can cover IFR tanks.</div></div>
+      </label>
+      <label class="radio-card roof-card" data-value="efr">
+        <input type="radio" name="outerRoof" value="efr">
+        <span class="rc-icon">🌊</span>
+        <div class="rc-text"><div class="rc-title">External Floating Roof</div><div class="rc-desc">Open-top tank, CS floating roof. Single or double deck.</div></div>
+      </label>
+      <label class="radio-card roof-card" data-value="openTop">
+        <input type="radio" name="outerRoof" value="openTop">
+        <span class="rc-icon">⭕</span>
+        <div class="rc-text"><div class="rc-title">Open Top</div><div class="rc-desc">No roof. Fire water, non-volatile products only.</div></div>
+      </label>
+    </div>
+
+    <div id="roof-error" class="notice danger" style="display:none; margin-top:12px;"><span class="notice-icon">✗</span><span></span></div>
+
+    <!-- IFR sub-options -->
+    <div class="toggle-section" id="ifr-section">
+      <div class="card-title" style="margin-bottom:10px;">Internal Floating Roof (IFR)</div>
+      <p style="font-size:12px;color:var(--text-sec);margin-bottom:12px;">Select type or choose None. IFR floats on the liquid surface inside the fixed outer roof, reducing vapour losses.</p>
+      <div class="radio-grid">
+        <label class="radio-card ifr-card" data-value="none">
+          <input type="radio" name="ifrType" value="none">
+          <span class="rc-icon">🚫</span>
+          <div class="rc-text"><div class="rc-title">No IFR</div><div class="rc-desc">Fixed roof only.</div></div>
+        </label>
+        <label class="radio-card ifr-card" data-value="ifrPontoon">
+          <input type="radio" name="ifrType" value="ifrPontoon">
+          <span class="rc-icon">🛟</span>
+          <div class="rc-text"><div class="rc-title">CS Pontoon IFR</div><div class="rc-desc">Perimeter pontoon + centre deck. Common, cost-effective.</div></div>
+        </label>
+        <label class="radio-card ifr-card" data-value="ifrFullContact">
+          <input type="radio" name="ifrType" value="ifrFullContact">
+          <span class="rc-icon">🔧</span>
+          <div class="rc-text"><div class="rc-title">CS Full Contact IFR</div><div class="rc-desc">All-welded full-area deck. Higher emission reduction.</div></div>
+        </label>
+      </div>
+      <div id="ifr-error" class="notice danger" style="display:none; margin-top:10px;"><span class="notice-icon">✗</span><span></span></div>
+    </div>
+
+    <!-- EFR sub-options -->
+    <div class="toggle-section" id="efr-section">
+      <div class="card-title" style="margin-bottom:10px;">External Floating Roof Type</div>
+      <div class="radio-grid">
+        <label class="radio-card efr-card" data-value="efrSingle">
+          <input type="radio" name="efrType" value="efrSingle">
+          <span class="rc-icon">📀</span>
+          <div class="rc-text"><div class="rc-title">Single Deck (Pan)</div><div class="rc-desc">Simple pan-type. Lower volatility products.</div></div>
+        </label>
+        <label class="radio-card efr-card" data-value="efrDouble">
+          <input type="radio" name="efrType" value="efrDouble">
+          <span class="rc-icon">💿</span>
+          <div class="rc-text"><div class="rc-title">Double Deck Pontoon</div><div class="rc-desc">Higher buoyancy reserve. Crude, naphtha.</div></div>
+        </label>
+      </div>
+      <div id="efr-error" class="notice danger" style="display:none; margin-top:10px;"><span class="notice-icon">✗</span><span></span></div>
+    </div>
+
+    <!-- Frangible roof -->
+    <div class="toggle-section" id="frangible-section">
+      <div class="card-title" style="margin-bottom:10px;">Roof Joint Type (API 650 §5.10.2)</div>
+      <p style="font-size:12px;color:var(--text-sec);margin-bottom:12px;">A frangible joint is standard for atmospheric tanks — the roof lifts before the shell separates in an overpressure event. Non-frangible requires P/V relief vents (excluded from this estimate).</p>
+      <div class="radio-grid">
+        <label class="radio-card frangible-card selected" data-value="true">
+          <input type="radio" name="frangible" value="true" checked>
+          <span class="rc-icon">✅</span>
+          <div class="rc-text"><div class="rc-title">Frangible Joint</div><div class="rc-desc">Standard. Roof-to-shell joint is the weak point. Recommended.</div></div>
+        </label>
+        <label class="radio-card frangible-card" data-value="false">
+          <input type="radio" name="frangible" value="false">
+          <span class="rc-icon">🔒</span>
+          <div class="rc-text"><div class="rc-title">Non-Frangible Joint</div><div class="rc-desc">Reinforced joint. Requires P/V relief vents — budget separately.</div></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav-buttons">
+    <div></div>
+    <button class="btn btn-primary" id="next-1">Next: Materials &amp; Design →</button>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     STEP 2 — MATERIALS & DESIGN
+───────────────────────────────────────────────────────────────────────────── -->
+<section id="step-2" class="step-panel">
+  <div class="step-header">
+    <h2>Step 2 — Materials &amp; Design Parameters</h2>
+    <p>Select shell material and set corrosion allowances and design inputs.</p>
+  </div>
+
+  <!-- Shell Material -->
+  <div class="card">
+    <div class="card-title">Shell &amp; Structural Material</div>
+    <p style="font-size:13px;color:var(--text-sec);margin-bottom:14px;">Applies to shell, bottom, structural steel, and fixed steel roof. Nozzle material defaults to match the shell.</p>
+    <div class="radio-grid">
+      <label class="radio-card mat-card" data-value="CS-A36">
+        <input type="radio" name="shellMat" value="CS-A36">
+        <span class="rc-icon">⚙️</span>
+        <div class="rc-text"><div class="rc-title">CS — ASTM A36</div><div class="rc-desc">General service. Most common in region. Sd = 137.9 MPa.</div></div>
+      </label>
+      <label class="radio-card mat-card" data-value="CS-A516-60">
+        <input type="radio" name="shellMat" value="CS-A516-60">
+        <span class="rc-icon">⚙️</span>
+        <div class="rc-text"><div class="rc-title">CS — A516 Gr.60</div><div class="rc-desc">Pressure vessel quality. Moderate temperature service.</div></div>
+      </label>
+      <label class="radio-card mat-card" data-value="CS-A516-70">
+        <input type="radio" name="shellMat" value="CS-A516-70">
+        <span class="rc-icon">⚙️</span>
+        <div class="rc-text"><div class="rc-title">CS — A516 Gr.70</div><div class="rc-desc">Improved toughness. Low-temp or cyclic service.</div></div>
+      </label>
+      <label class="radio-card mat-card" data-value="SS-304">
+        <input type="radio" name="shellMat" value="SS-304">
+        <span class="rc-icon">✨</span>
+        <div class="rc-text"><div class="rc-title">SS — AISI 304</div><div class="rc-desc">General corrosion resistance. Food, water, mild chemicals.</div></div>
+      </label>
+      <label class="radio-card mat-card" data-value="SS-316">
+        <input type="radio" name="shellMat" value="SS-316">
+        <span class="rc-icon">✨</span>
+        <div class="rc-text"><div class="rc-title">SS — AISI 316</div><div class="rc-desc">Chloride &amp; acid environments. Marine, chemical service.</div></div>
+      </label>
+      <label class="radio-card mat-card" data-value="SS-316L">
+        <input type="radio" name="shellMat" value="SS-316L">
+        <span class="rc-icon">✨</span>
+        <div class="rc-text"><div class="rc-title">SS — AISI 316L</div><div class="rc-desc">Low carbon. Resists sensitisation after welding. Pharma, food.</div></div>
+      </label>
+    </div>
+    <div id="mat-error" class="notice danger" style="display:none; margin-top:12px;"><span class="notice-icon">✗</span><span></span></div>
+  </div>
+
+  <!-- Design Inputs -->
+  <div class="card">
+    <div class="card-title">Design Inputs</div>
+    <div class="notice info">
+      <span class="notice-icon">ℹ</span>
+      <div>Corrosion allowance defaults are pre-filled based on selected material. SS tanks typically require 0 mm CA. Override as required by corrosion engineering review.</div>
+    </div>
+    <div class="form-row three">
+      <div class="form-group">
+        <label for="corrosionShell">Shell Corrosion Allowance (mm)</label>
+        <input type="number" id="corrosionShell" min="0" max="10" step="0.5" value="3">
+        <span class="hint">Applied to all shell courses and roof. Range 0–10 mm.</span>
+        <span class="field-error" id="corrosionShell-err"></span>
+      </div>
+      <div class="form-group">
+        <label for="corrosionBottom">Bottom Corrosion Allowance (mm)</label>
+        <input type="number" id="corrosionBottom" min="0" max="10" step="0.5" value="3">
+        <span class="hint">Applied to bottom plate thickness. Range 0–10 mm.</span>
+        <span class="field-error" id="corrosionBottom-err"></span>
+      </div>
+      <div class="form-group">
+        <label for="windSpeed">Design Wind Speed (m/s)</label>
+        <input type="number" id="windSpeed" min="20" max="80" step="1" value="35">
+        <span class="hint">Default: 35 m/s per SS CP3 (Singapore).</span>
+        <span class="field-error" id="windSpeed-err"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav-buttons">
+    <button class="btn btn-secondary" id="back-2">← Back</button>
+    <button class="btn btn-primary" id="next-2">Next: Scope &amp; Options →</button>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     STEP 3 — SCOPE & OPTIONS
+───────────────────────────────────────────────────────────────────────────── -->
+<section id="step-3" class="step-panel">
+  <div class="step-header">
+    <h2>Step 3 — Scope &amp; Options</h2>
+    <p>Select painting, accessories, fire protection, freight, erection method, and review the nozzle schedule.</p>
+  </div>
+
+  <!-- Internal Coating -->
+  <div class="card">
+    <div class="card-title">Internal Coating</div>
+
+    <!-- Partial paint height option -->
+    <div style="margin-bottom:14px;">
+      <p style="font-size:13px;color:var(--text-sec);margin-bottom:10px;">Paint height — select full tank height or specify a partial level:</p>
+      <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+        <label class="radio-inline"><input type="radio" id="paintHeightFull" name="paintHeight" value="full" checked> Full liquid height</label>
+        <label class="radio-inline"><input type="radio" id="paintHeightPartial" name="paintHeight" value="partial"> Partial height only</label>
+      </div>
+      <div id="paintHeightRow" style="display:none;margin-top:10px;max-width:260px;">
+        <div class="form-group">
+          <label for="internalPaintHeight">Paint up to height (m)</label>
+          <input type="number" id="internalPaintHeight" min="0.1" step="0.1" placeholder="e.g. 3.0">
+          <span class="field-error" id="internalPaintHeight-err"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="radio-grid">
+      <label class="radio-card int-coat-card" data-value="none">
+        <input type="radio" name="intCoat" value="none">
+        <span class="rc-icon">⬜</span>
+        <div class="rc-text"><div class="rc-title">None</div><div class="rc-desc">No internal coating. CS tanks will corrode.</div></div>
+      </label>
+      <label class="radio-card int-coat-card" data-value="epoxy2coat">
+        <input type="radio" name="intCoat" value="epoxy2coat">
+        <span class="rc-icon">🎨</span>
+        <div class="rc-text"><div class="rc-title">Epoxy 2-coat</div><div class="rc-desc">Blast SA 2.5 + primer + 1 epoxy topcoat. General service.</div></div>
+      </label>
+      <label class="radio-card int-coat-card selected" data-value="glassFlake">
+        <input type="radio" name="intCoat" value="glassFlake" checked>
+        <span class="rc-icon">🛡️</span>
+        <div class="rc-text"><div class="rc-title">Glass Flake Epoxy</div><div class="rc-desc">Higher chemical resistance. Fuel, chemicals, seawater.</div></div>
+      </label>
+      <label class="radio-card int-coat-card" data-value="passivation">
+        <input type="radio" name="intCoat" value="passivation">
+        <span class="rc-icon">✨</span>
+        <div class="rc-text"><div class="rc-title">Passivation (SS only)</div><div class="rc-desc">Acid pickling + passivation. No paint. SS tanks only.</div></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- External Coating -->
+  <div class="card">
+    <div class="card-title">External Coating</div>
+    <p style="font-size:13px;color:var(--text-sec);margin-bottom:12px;">Applied separately to shell (vertical) and roof (horizontal/sloped — higher rate). Aluminium geodesic dome is excluded from external painting (vendor finish).</p>
+    <div class="radio-grid">
+      <label class="radio-card ext-coat-card" data-value="none">
+        <input type="radio" name="extCoat" value="none">
+        <span class="rc-icon">⬜</span>
+        <div class="rc-text"><div class="rc-title">None</div><div class="rc-desc">No external coating. Not recommended for Singapore climate.</div></div>
+      </label>
+      <label class="radio-card ext-coat-card selected" data-value="standard">
+        <input type="radio" name="extCoat" value="standard" checked>
+        <span class="rc-icon">🎨</span>
+        <div class="rc-text"><div class="rc-title">Standard 3-coat</div><div class="rc-desc">Blast SA 2.5 + primer + 2 finish coats. Typical.</div></div>
+      </label>
+      <label class="radio-card ext-coat-card" data-value="premium">
+        <input type="radio" name="extCoat" value="premium">
+        <span class="rc-icon">⭐</span>
+        <div class="rc-text"><div class="rc-title">Premium 3-coat + stripe</div><div class="rc-desc">Additional stripe coat at welds and edges. Extended service life.</div></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- Floating Roof Paint (conditional) -->
+  <div class="card" id="floatPaintSection" style="display:none;">
+    <div class="card-title">Floating Roof Coating</div>
+    <p style="font-size:13px;color:var(--text-sec);margin-bottom:12px;">Top deck = weather-exposed face. Underside = product-contact face. Both can be coated independently.</p>
+    <div class="radio-grid">
+      <label class="radio-card float-paint-card selected" data-value="none">
+        <input type="radio" name="floatPaint" value="none" checked>
+        <span class="rc-icon">⬜</span>
+        <div class="rc-text"><div class="rc-title">Not Painted</div><div class="rc-desc">No coating on floating roof surfaces.</div></div>
+      </label>
+      <label class="radio-card float-paint-card" data-value="topOnly">
+        <input type="radio" name="floatPaint" value="topOnly">
+        <span class="rc-icon">☀️</span>
+        <div class="rc-text"><div class="rc-title">Top Deck Only</div><div class="rc-desc">External/weather face coated. Blast + 2-coat system.</div></div>
+      </label>
+      <label class="radio-card float-paint-card" data-value="undersideOnly">
+        <input type="radio" name="floatPaint" value="undersideOnly">
+        <span class="rc-icon">🔽</span>
+        <div class="rc-text"><div class="rc-title">Underside Only</div><div class="rc-desc">Product-contact face coated. Epoxy 2-coat system.</div></div>
+      </label>
+      <label class="radio-card float-paint-card" data-value="both">
+        <input type="radio" name="floatPaint" value="both">
+        <span class="rc-icon">🔄</span>
+        <div class="rc-text"><div class="rc-title">Both Sides</div><div class="rc-desc">Top deck and underside both coated.</div></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- Rim Seal (conditional) -->
+  <div class="card" id="rimSealSection" style="display:none;">
+    <div class="card-title">Rim Seal System</div>
+    <p style="font-size:13px;color:var(--text-sec);margin-bottom:12px;">Rim seal closes the gap between the floating roof edge and the shell. Primary + secondary is increasingly required by environmental regulations.</p>
+    <div class="radio-grid">
+      <label class="radio-card rim-card selected" data-value="primary">
+        <input type="radio" name="rimSeal" value="primary" checked>
+        <span class="rc-icon">🔵</span>
+        <div class="rc-text"><div class="rc-title">Primary Seal Only</div><div class="rc-desc">Mechanical shoe type. Standard vapour control.</div></div>
+      </label>
+      <label class="radio-card rim-card" data-value="primarySecondary">
+        <input type="radio" name="rimSeal" value="primarySecondary">
+        <span class="rc-icon">🔵🟢</span>
+        <div class="rc-text"><div class="rc-title">Primary + Secondary</div><div class="rc-desc">Shoe + foam-filled wiper. Enhanced emission control.</div></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- Access — Stair / Ladder -->
+  <div class="card">
+    <div class="card-title">Shell Access</div>
+    <div id="stair-auto-msg" class="notice info" style="display:none;">
+      <span class="notice-icon">ℹ</span>
+      <span class="stair-auto-text"></span>
+    </div>
+    <div id="stair-choice-block" style="display:none;">
+      <p style="font-size:13px;color:var(--text-sec);margin-bottom:12px;">Shell height is between 4–6 m. Select preferred access method.</p>
+      <div class="radio-grid">
+        <label class="radio-card stair-card" data-value="cageLadder">
+          <input type="radio" name="stairType" value="cageLadder">
+          <span class="rc-icon">🪜</span>
+          <div class="rc-text"><div class="rc-title">Cage Ladder</div><div class="rc-desc">Vertical ladder with safety cage. Lower cost.</div></div>
+        </label>
+        <label class="radio-card stair-card selected" data-value="spiralStair">
+          <input type="radio" name="stairType" value="spiralStair" checked>
+          <span class="rc-icon">🔄</span>
+          <div class="rc-text"><div class="rc-title">Spiral Staircase</div><div class="rc-desc">Easier access for operational tanks. Preferred.</div></div>
+        </label>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">Roof perimeter walkway (handrail + grating) is included for all fixed-roof and EFR tanks. Rolling ladder included automatically for EFR.</p>
+  </div>
+
+  <!-- Fluid Classification -->
+  <div class="card">
+    <div class="card-title">Stored Fluid Classification (SS 532)</div>
+    <p style="font-size:13px;color:var(--text-sec);margin-bottom:12px;">Determines whether a fixed fire protection system is required and what type. Piping scope: top-of-shell ring header, vertical supply pipe, and flanged tie-in at tank shell bottom.</p>
+    <div class="radio-grid wide">
+      <label class="radio-card fluid-card" data-value="class0">
+        <input type="radio" name="fluidClass" value="class0">
+        <span class="rc-icon">🚫</span>
+        <div class="rc-text"><div class="rc-title">Class 0 — LPG / LNG</div><div class="rc-desc">Compressed/liquefied gas. Out of scope for API 650.</div></div>
+      </label>
+      <label class="radio-card fluid-card" data-value="classI">
+        <input type="radio" name="fluidClass" value="classI">
+        <span class="rc-icon">🔴</span>
+        <div class="rc-text"><div class="rc-title">Class I — fp &lt; 23°C</div><div class="rc-desc">Petrol, naphtha, crude oil, aviation fuel. Full foam system.</div></div>
+      </label>
+      <label class="radio-card fluid-card" data-value="classII">
+        <input type="radio" name="fluidClass" value="classII">
+        <span class="rc-icon">🟠</span>
+        <div class="rc-text"><div class="rc-title">Class II — fp 23–60°C</div><div class="rc-desc">Kerosene, diesel, jet A-1. Standard foam system.</div></div>
+      </label>
+      <label class="radio-card fluid-card" data-value="classIII">
+        <input type="radio" name="fluidClass" value="classIII">
+        <span class="rc-icon">🟡</span>
+        <div class="rc-text"><div class="rc-title">Class III — fp 60–150°C</div><div class="rc-desc">Fuel oil, lubricating oil. Water cooling ring.</div></div>
+      </label>
+      <label class="radio-card fluid-card selected" data-value="classIV">
+        <input type="radio" name="fluidClass" value="classIV" checked>
+        <span class="rc-icon">🟢</span>
+        <div class="rc-text"><div class="rc-title">Class IV — fp &gt; 150°C or non-flammable</div><div class="rc-desc">Water, brine, heavy oil. No fixed fire system required.</div></div>
+      </label>
+    </div>
+    <div id="fire-class0-notice" class="notice danger" style="display:none; margin-top:12px;">
+      <span class="notice-icon">🚫</span>
+      <span>Class 0 (LPG/LNG) is out of scope for API 650 atmospheric tanks. Please consult a specialist engineer for cryogenic or pressurised storage.</span>
+    </div>
+    <div id="fluid-error" class="notice danger" style="display:none; margin-top:12px;"><span class="notice-icon">✗</span><span></span></div>
+  </div>
+
+  <!-- Freight -->
+  <div class="card">
+    <div class="card-title">Freight</div>
+    <div class="radio-grid">
+      <label class="radio-card freight-card selected" data-value="mysSg">
+        <input type="radio" name="freight" value="mysSg" checked>
+        <span class="rc-icon">🚛</span>
+        <div class="rc-text"><div class="rc-title">Malaysia → Singapore</div><div class="rc-desc">Road transport, customs, permits. S$5,000 + S$160/t.</div></div>
+      </label>
+      <label class="radio-card freight-card" data-value="localSg">
+        <input type="radio" name="freight" value="localSg">
+        <span class="rc-icon">🏙️</span>
+        <div class="rc-text"><div class="rc-title">Local Singapore</div><div class="rc-desc">Local haulage only. No customs. S$80/t.</div></div>
+      </label>
+      <label class="radio-card freight-card" data-value="none">
+        <input type="radio" name="freight" value="none">
+        <span class="rc-icon">❌</span>
+        <div class="rc-text"><div class="rc-title">Not Included</div><div class="rc-desc">Exclude freight from estimate. Add separately.</div></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- Erection Method -->
+  <div class="card">
+    <div class="card-title">Erection Method</div>
+    <div class="notice info" style="margin-bottom:12px;">
+      <span class="notice-icon">ℹ</span>
+      <div>The <strong>jacking method</strong> is generally more economical for tanks with 5 or more shell courses (height ≥ ~12 m). It requires a one-off S$30,000 rig mobilisation.</div>
+    </div>
+    <div class="radio-grid">
+      <label class="radio-card erect-card selected" data-value="traditional">
+        <input type="radio" name="erect" value="traditional" checked>
+        <span class="rc-icon">🏗️</span>
+        <div class="rc-text"><div class="rc-title">Traditional (Scaffolding)</div><div class="rc-desc">Bottom-up erection. Suitable for all tank sizes.</div></div>
+      </label>
+      <label class="radio-card erect-card" data-value="jacking">
+        <input type="radio" name="erect" value="jacking">
+        <span class="rc-icon">⬆️</span>
+        <div class="rc-text"><div class="rc-title">Jacking Method</div><div class="rc-desc">Top-down hydraulic jacking. Efficient for tall tanks (≥5 courses).</div></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- Nozzle Schedule -->
+  <div class="card">
+    <div class="card-title">Nozzle &amp; Manhole Schedule</div>
+    <div class="notice warn" style="margin-bottom:12px;">
+      <span class="notice-icon">⚠</span>
+      <div>Quantities are pre-filled based on tank diameter. Review and adjust to match the actual process nozzle schedule. Nozzle material defaults to match the selected shell material.</div>
+    </div>
+    <table class="nozzle-table">
+      <thead>
+        <tr><th>Item</th><th>Description</th><th>Qty</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Shell nozzles ≤4" NPS</td>
+          <td class="desc">Drain, sample, gauge, level, vent connections</td>
+          <td><input type="number" class="nozzle-qty" data-key="shell_small" min="0" value="0"></td>
+        </tr>
+        <tr>
+          <td>Shell nozzles 6"–10" NPS</td>
+          <td class="desc">Inlet, outlet, overflow, pump suction</td>
+          <td><input type="number" class="nozzle-qty" data-key="shell_medium" min="0" value="0"></td>
+        </tr>
+        <tr>
+          <td>Shell nozzles 12"–16" NPS</td>
+          <td class="desc">Main inlet/outlet, emergency drain</td>
+          <td><input type="number" class="nozzle-qty" data-key="shell_large" min="0" value="0"></td>
+        </tr>
+        <tr>
+          <td>Shell manholes 20"/24"</td>
+          <td class="desc">Access for inspection and internal maintenance</td>
+          <td><input type="number" class="nozzle-qty" data-key="shell_mh" min="0" value="0"></td>
+        </tr>
+        <tr>
+          <td>Roof nozzles ≤4" NPS</td>
+          <td class="desc">Roof vents, gauging, sample, fill connections</td>
+          <td><input type="number" class="nozzle-qty" data-key="roof_small" min="0" value="0"></td>
+        </tr>
+        <tr>
+          <td>Roof manholes 20"</td>
+          <td class="desc">Roof access hatch with cover and hinge</td>
+          <td><input type="number" class="nozzle-qty" data-key="roof_mh" min="0" value="0"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="nozzle-error" class="notice danger" style="display:none; margin-top:12px;"><span class="notice-icon">✗</span><span></span></div>
+  </div>
+
+  <div class="step-nav-buttons">
+    <button class="btn btn-secondary" id="back-3">← Back</button>
+    <button class="btn btn-success" id="calc-btn">🧮 Calculate Estimate</button>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     OUTPUT PANEL
+───────────────────────────────────────────────────────────────────────────── -->
+<section id="output-panel">
+  <div id="output-content"></div>
+</section>
+
+</main>
+</div><!-- /app-body -->
+</div><!-- /newbuild-wrapper -->
+
+<!-- REPAIR MODULE -->
+<div id="repair-wrapper" style="display:none;min-height:calc(100vh - 58px);">
+<nav id="repair-sidebar">
+  <button class="btn btn-secondary" onclick="exitRepairModule()" style="margin:12px 16px 20px;width:calc(100% - 32px);font-size:12px;">&#x2190; Home</button>
+  <ul class="step-nav">
+    <li data-rstep="select"><div class="step-circle">1</div><div class="step-info"><div class="step-label">Step 1</div><div class="step-name">Select Repairs</div></div></li>
+    <div class="step-divider"></div>
+    <li data-rstep="tank"><div class="step-circle">2</div><div class="step-info"><div class="step-label">Step 2</div><div class="step-name">Existing Tank</div></div></li>
+    <div class="step-divider"></div>
+    <li data-rstep="details"><div class="step-circle">3</div><div class="step-info"><div class="step-label">Step 3</div><div class="step-name">Repair Details</div></div></li>
+    <div class="step-divider"></div>
+    <li data-rstep="options"><div class="step-circle">4</div><div class="step-info"><div class="step-label">Step 4</div><div class="step-name">Options</div></div></li>
+    <div class="step-divider"></div>
+    <li data-rstep="output"><div class="step-circle">&#x2713;</div><div class="step-info"><div class="step-label">Output</div><div class="step-name">Cost Estimate</div></div></li>
+  </ul>
+</nav>
+<main id="repair-main">
+
+<section id="repair-step-select" class="step-panel repair-step active">
+  <div class="step-header"><h2>Step 1 &#x2014; Select Repair Scope</h2>
+    <p>Choose all repair or retrofit activities to include. Costs are combined into one estimate.</p></div>
+  <div class="card">
+    <div class="card-title">Repair / Retrofit Activities</div>
+    <div id="repair-select-list"></div>
+  </div>
+  <div class="step-nav-buttons">
+    <button class="btn btn-secondary" onclick="exitRepairModule()">&#x2190; Home</button>
+    <button class="btn btn-primary" id="repair-select-next" disabled
+      onclick="showRepairStep('tank');buildTankDetailsForm()">Next: Existing Tank &#x2192;</button>
+  </div>
+</section>
+
+<section id="repair-step-tank" class="step-panel repair-step">
+  <div class="step-header"><h2>Step 2 &#x2014; Existing Tank Details</h2>
+    <p>Enter the dimensions and configuration of the tank to be repaired.</p></div>
+  <div class="card">
+    <div class="card-title">Tank Dimensions</div>
+    <div class="form-row">
+      <div class="form-group"><label for="r-diameter">Nominal Diameter (m)</label>
+        <input type="number" id="r-diameter" min="1" max="120" step="0.1" placeholder="e.g. 20.0">
+        <span class="hint">Inside diameter, 1&#x2013;120 m</span></div>
+      <div class="form-group"><label for="r-shellHeight">Shell Height (m)</label>
+        <input type="number" id="r-shellHeight" min="1" max="25" step="0.1" placeholder="e.g. 12.0">
+        <span class="hint">Total shell height, 1&#x2013;25 m</span></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label for="r-sg">Design Liquid Specific Gravity</label>
+        <input type="number" id="r-sg" min="0.5" max="2.5" step="0.01" value="1.00"></div>
+      <div class="form-group"><label for="r-material">Shell Material</label>
+        <select id="r-material">
+          <option value="">&#x2014; Select &#x2014;</option>
+          <option value="CS-A36">A36 (CS)</option>
+          <option value="CS-A516-60">A516 Gr.60 (CS)</option>
+          <option value="CS-A516-70">A516 Gr.70 (CS)</option>
+          <option value="SS-304">304 Stainless</option>
+          <option value="SS-316">316 Stainless</option>
+          <option value="SS-316L">316L Stainless</option>
+        </select></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Existing Roof &amp; Floating Roof</div>
+    <div class="form-row">
+      <div class="form-group"><label for="r-roof-type">Outer Roof Type</label>
+        <select id="r-roof-type">
+          <option value="">&#x2014; Select &#x2014;</option>
+          <option value="coneCS">Fixed Cone Roof (CS)</option>
+          <option value="domeCS">Fixed Dome Roof (CS)</option>
+          <option value="domeAL">Geodesic Dome (Aluminium)</option>
+          <option value="efr">External Floating Roof (EFR)</option>
+          <option value="openTop">Open Top</option>
+        </select></div>
+      <div class="form-group"><label for="r-ifr-type">Internal Floating Roof (IFR)</label>
+        <select id="r-ifr-type">
+          <option value="none">None</option>
+          <option value="ifrPontoon">Pontoon type</option>
+          <option value="ifrFullContact">Full contact type</option>
+        </select></div>
+    </div>
+    <div class="form-group"><label for="r-efr-type">EFR Type (if applicable)</label>
+      <select id="r-efr-type">
+        <option value="">N/A</option>
+        <option value="efrSingle">Single deck EFR</option>
+        <option value="efrDouble">Double deck EFR</option>
+      </select></div>
+    <div class="notice danger" id="tank-err" style="display:none;margin-top:12px;"><span class="notice-icon">&#x2717;</span><span></span></div>
+  </div>
+  <div class="step-nav-buttons">
+    <button class="btn btn-secondary" onclick="showRepairStep('select')">&#x2190; Back</button>
+    <button class="btn btn-primary" onclick="if(collectTankDetails()){buildRepairDetailPanels();showRepairStep('details')}">Next: Repair Details &#x2192;</button>
+  </div>
+</section>
+
+<section id="repair-step-details" class="step-panel repair-step">
+  <div class="step-header"><h2>Step 3 &#x2014; Repair Details</h2>
+    <p>Provide scope details for each selected activity.</p></div>
+  <div id="repair-detail-panels"></div>
+  <div class="step-nav-buttons">
+    <button class="btn btn-secondary" onclick="showRepairStep('tank')">&#x2190; Back</button>
+    <button class="btn btn-primary" onclick="showRepairStep('options');buildRepairOptions()">Next: Options &#x2192;</button>
+  </div>
+</section>
+
+<section id="repair-step-options" class="step-panel repair-step">
+  <div class="step-header"><h2>Step 4 &#x2014; Options</h2></div>
+  <div class="card">
+    <div class="card-title">Estimate Settings</div>
+    <div class="form-group" style="max-width:260px;">
+      <label for="r-contingency">Contingency (%)</label>
+      <input type="number" id="r-contingency" min="0" max="50" step="1" value="15">
+      <span class="hint">Applied to full scope total. Typical: 10&#x2013;20% for repair works.</span>
+    </div>
+  </div>
+  <div class="step-nav-buttons">
+    <button class="btn btn-secondary" onclick="showRepairStep('details')">&#x2190; Back</button>
+    <button class="btn btn-success" onclick="runRepairCalculation()">&#x1F9EE; Calculate Estimate</button>
+  </div>
+</section>
+
+<section id="repair-step-output" class="step-panel repair-step">
+  <div id="repair-output-content"></div>
+  <div class="step-nav-buttons" style="margin-top:24px;">
+    <button class="btn btn-secondary" onclick="showRepairStep('options')">&#x2190; Back</button>
+    <button class="btn btn-primary" onclick="window.print()">&#x1F5A8; Print / Save PDF</button>
+    <button class="btn btn-secondary" onclick="exitRepairModule()">&#x1F3E0; New Estimate</button>
+  </div>
+</section>
+
+</main>
+</div><!-- /repair-wrapper -->
+
+<script src="js/output.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
