@@ -324,18 +324,18 @@ function renderOutput() {
 
           <!-- A: Material Supply -->
           <tr class="cat-row"><td colspan="3">A — Material Supply</td></tr>
-          <tr class="sub-row"><td>Shell plates</td><td class="num">${roundTo(est.shellWeight,1)} t</td><td class="num">S$${COST_RATES.plate[matKey]}/t</td><td class="num">${SGD(est.mat_shell)}</td></tr>
-          <tr class="sub-row"><td>Structural steel — wind girder, stiffeners, top angle (12% of shell)</td><td class="num">${roundTo(est.structWeight,1)} t</td><td class="num">S$${COST_RATES.plate[matKey]}/t</td><td class="num">${SGD(est.mat_struct)}</td></tr>
-          <tr class="sub-row"><td>Bottom plates — annular + sketch plates</td><td class="num">${roundTo(est.bottomWeight,1)} t</td><td class="num">S$${COST_RATES.plate[matKey]}/t</td><td class="num">${SGD(est.mat_bottom)}</td></tr>
-          ${est.mat_outerRoof > 0 ? `<tr class="sub-row"><td>Outer roof plates (${LABELS.outerRoof[state.outerRoof]})</td><td class="num">${roundTo(est.outerRoofWeight,1)} t</td><td class="num">S$${COST_RATES.plate[matKey]}/t</td><td class="num">${SGD(est.mat_outerRoof)}</td></tr>` : ''}
-          ${est.mat_floatRoof > 0 ? `<tr class="sub-row"><td>Floating roof plates</td><td class="num">${roundTo(est.floatRoofWeight,1)} t</td><td class="num">S$${COST_RATES.plate[matKey]}/t</td><td class="num">${SGD(est.mat_floatRoof)}</td></tr>` : ''}
+          <tr class="sub-row"><td>Shell plates</td><td class="num">${roundTo(est.shellWeight,1)} t</td><td class="num">S$${COST_RATES.plate[est.matKey]}/t</td><td class="num">${SGD(est.mat_shell)}</td></tr>
+          <tr class="sub-row"><td>Structural steel — wind girder, stiffeners, top angle (12% of shell)</td><td class="num">${roundTo(est.structWeight,1)} t</td><td class="num">S$${COST_RATES.plate[est.matKey]}/t</td><td class="num">${SGD(est.mat_struct)}</td></tr>
+          <tr class="sub-row"><td>Bottom plates — annular + sketch plates</td><td class="num">${roundTo(est.bottomWeight,1)} t</td><td class="num">S$${COST_RATES.plate[est.matKey]}/t</td><td class="num">${SGD(est.mat_bottom)}</td></tr>
+          ${est.mat_outerRoof > 0 ? `<tr class="sub-row"><td>Outer roof plates (${LABELS.outerRoof[state.outerRoof]})</td><td class="num">${roundTo(est.outerRoofWeight,1)} t</td><td class="num">S$${COST_RATES.plate[est.matKey]}/t</td><td class="num">${SGD(est.mat_outerRoof)}</td></tr>` : ''}
+          ${est.mat_floatRoof > 0 ? `<tr class="sub-row"><td>Floating roof plates</td><td class="num">${roundTo(est.floatRoofWeight,1)} t</td><td class="num">S$${COST_RATES.plate[est.matKey]}/t</td><td class="num">${SGD(est.mat_floatRoof)}</td></tr>` : ''}
           <tr class="subtotal-row"><td colspan="3">Material Supply Subtotal</td><td class="num">${SGD(est.mat_total)}</td></tr>
 
           <!-- B: Fabrication -->
           <tr class="cat-row"><td colspan="3">B — Fabrication (ex-yard, Malaysia)</td></tr>
-          <tr class="sub-row"><td>Shell fabrication — rolling, fit-up, welding, NDE</td><td class="num">${roundTo(est.shellWeight,1)} t</td><td class="num">S$${COST_RATES.fabrication.shell[matType]}/t</td><td class="num">${SGD(est.fab_shell)}</td></tr>
-          <tr class="sub-row"><td>Structural steel fabrication</td><td class="num">${roundTo(est.structWeight,1)} t</td><td class="num">S$${COST_RATES.fabrication.structural[matType]}/t</td><td class="num">${SGD(est.fab_struct)}</td></tr>
-          <tr class="sub-row"><td>Bottom plate fabrication</td><td class="num">${roundTo(est.bottomWeight,1)} t</td><td class="num">S$${COST_RATES.fabrication.bottom[matType]}/t</td><td class="num">${SGD(est.fab_bottom)}</td></tr>
+          <tr class="sub-row"><td>Shell fabrication — rolling, fit-up, welding, NDE</td><td class="num">${roundTo(est.shellWeight,1)} t</td><td class="num">S$${COST_RATES.fabrication.shell[est.matType]}/t</td><td class="num">${SGD(est.fab_shell)}</td></tr>
+          <tr class="sub-row"><td>Structural steel fabrication</td><td class="num">${roundTo(est.structWeight,1)} t</td><td class="num">S$${COST_RATES.fabrication.structural[est.matType]}/t</td><td class="num">${SGD(est.fab_struct)}</td></tr>
+          <tr class="sub-row"><td>Bottom plate fabrication</td><td class="num">${roundTo(est.bottomWeight,1)} t</td><td class="num">S$${COST_RATES.fabrication.bottom[est.matType]}/t</td><td class="num">${SGD(est.fab_bottom)}</td></tr>
           ${est.fab_outerRoof > 0 ? `<tr class="sub-row"><td>Outer roof fabrication${!state.frangibleRoof ? ' (non-frangible premium +7%)' : ''}</td><td class="num">${roundTo(est.outerRoofWeight,1)} t</td><td class="num">—</td><td class="num">${SGD(est.fab_outerRoof)}</td></tr>` : ''}
           ${showIFREFRFab ? `<tr class="sub-row"><td>Floating roof fabrication</td><td class="num">${roundTo(est.floatRoofWeight,1)} t</td><td class="num">—</td><td class="num">${SGD(est.fab_floatRoof)}</td></tr>` : ''}
           <tr class="subtotal-row"><td colspan="3">Fabrication Subtotal</td><td class="num">${SGD(est.fab_total)}</td></tr>
@@ -358,7 +358,7 @@ function renderOutput() {
 
           <!-- E: Erection -->
           <tr class="cat-row"><td colspan="3">E — Site Erection, Singapore</td></tr>
-          <tr class="sub-row"><td>Erection labour &amp; crane (${LABELS.erection[state.erectionMethod]})</td><td class="num">${roundTo(est.totalSteelWeight,1)} t</td><td class="num">S$${COST_RATES.erection[state.erectionMethod][matType]}/t</td><td class="num">${SGD(est.erect_steel)}</td></tr>
+          <tr class="sub-row"><td>Erection labour &amp; crane (${LABELS.erection[state.erectionMethod]})</td><td class="num">${roundTo(est.totalSteelWeight,1)} t</td><td class="num">S$${COST_RATES.erection[state.erectionMethod][est.matType]}/t</td><td class="num">${SGD(est.erect_steel)}</td></tr>
           ${est.erect_mob > 0 ? `<tr class="sub-row"><td>Jacking rig mobilisation (lump sum)</td><td class="num">1 LS</td><td class="num">LS</td><td class="num">${SGD(est.erect_mob)}</td></tr>` : ''}
           <tr class="subtotal-row"><td colspan="3">Erection Subtotal</td><td class="num">${SGD(est.erect_total)}</td></tr>
 
@@ -408,7 +408,7 @@ function renderOutput() {
 
           <!-- Totals -->
           <tr><td colspan="3" style="padding:6px 0;"></td></tr>
-          <tr class="subtotal-row"><td colspan="2" style="font-size:14px;">Subtotal (before contingency)</td><td class="num" style="font-size:14px;">${SGD(est.subtotal)}</td></tr>
+          <tr class="subtotal-row"><td colspan="3" style="font-size:14px;">Subtotal (before contingency)</td><td class="num" style="font-size:14px;">${SGD(est.subtotal)}</td></tr>
           <tr class="contingency-row"><td colspan="3">Contingency (${contingencyPct}%)</td><td class="num">${SGD(contingencyAmt)}</td></tr>
           <tr class="total-row"><td colspan="3">TOTAL ESTIMATED PROJECT COST</td><td class="num">${SGD(grandTotal)}</td></tr>
 
@@ -493,9 +493,9 @@ function renderOutput() {
           <tr><td>Anchor chairs</td><td>${est.anchorCheck.required ? `Required: ${est.anchorCheck.count} chairs (Mw > Mstab)` : 'Not required (Mw < Mstab)'}</td></tr>
 
           <tr class="basis-section"><td colspan="2"><strong>Cost Rates Basis</strong></td></tr>
-          <tr><td>Plate material</td><td>${matKey} @ S$${COST_RATES.plate[matKey]}/t delivered to fab yard</td></tr>
-          <tr><td>Fabrication (shell)</td><td>S$${COST_RATES.fabrication.shell[matType]}/t ex-yard Malaysia</td></tr>
-          <tr><td>Site erection</td><td>S$${COST_RATES.erection[state.erectionMethod][matType]}/t — ${LABELS.erection[state.erectionMethod]}</td></tr>
+          <tr><td>Plate material</td><td>${est.matKey} @ S$${COST_RATES.plate[est.matKey]}/t delivered to fab yard</td></tr>
+          <tr><td>Fabrication (shell)</td><td>S$${COST_RATES.fabrication.shell[est.matType]}/t ex-yard Malaysia</td></tr>
+          <tr><td>Site erection</td><td>S$${COST_RATES.erection[state.erectionMethod][est.matType]}/t — ${LABELS.erection[state.erectionMethod]}</td></tr>
           <tr><td>Currency / Basis</td><td>SGD. SE Asia market, Q1 2025 (assumed). Accuracy ±20–25%.</td></tr>
           <tr><td>Prepared by</td><td>API 650 Tank Cost Estimator ${APP_VERSION} | ${dateStr}</td></tr>
         </tbody>
