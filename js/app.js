@@ -2,7 +2,7 @@
 // APP.JS — Wizard Flow, State Management, Form Logic
 // =============================================================================
 
-const APP_VERSION = "v1.2.0";
+const APP_VERSION = "v1.3.0";
 const APP_DATE    = "2025-01";
 
 function initNewBuild() {

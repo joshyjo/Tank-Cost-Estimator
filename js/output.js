@@ -469,7 +469,7 @@ function renderOutput() {
           ${est.hasFloatRoof ? `<tr><td>Floating roof deck area</td><td>π/4 × D² (approx.) = <strong>${roundTo(est.floatDeckArea,1)} m²</strong></td></tr>` : ''}
 
           <tr class="basis-section"><td colspan="2"><strong>Shell Design — API 650 One-Foot Method (§5.6.3)</strong></td></tr>
-          <tr><td>Shell courses</td><td>${est.courses.map((c,i)=>`Course ${i+1}: ${c.height} m, t_des=${c.t_design.toFixed(2)} mm → t_ord=${c.t_ordered} mm`).join(' | ')}</td></tr>
+          <tr><td>Shell courses</td><td>${est.courses.map((c,i)=>`Course ${i+1}: ${c.height} m, t_calc=${(c.t_calc||0).toFixed(2)} mm → t_ord=${c.t_ordered} mm`).join(' | ')}</td></tr>
           <tr><td>Shell weight</td><td>Σ(area per course × t_ordered × 7.85 t/m³) = <strong>${roundTo(est.shellWeight,2)} t</strong></td></tr>
           <tr><td>Structural steel (12% allowance)</td><td>12% × shell weight = 0.12 × ${roundTo(est.shellWeight,2)} = <strong>${roundTo(est.structWeight,2)} t</strong> (wind girder, stiffeners, top angle)</td></tr>
 
