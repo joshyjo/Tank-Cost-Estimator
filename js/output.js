@@ -319,98 +319,98 @@ function renderOutput() {
     <div class="card">
       <div class="card-title">Itemised Cost Estimate (SGD)</div>
       <table class="cost-table">
-        <thead><tr><th>Description</th><th class="num">Qty / Basis</th><th class="num">Cost (SGD)</th></tr></thead>
+        <thead><tr><th>Description</th><th class="num">Qty / Basis</th><th class="num">Unit Rate</th><th class="num">Cost (SGD)</th></tr></thead>
         <tbody>
 
           <!-- A: Material Supply -->
           <tr class="cat-row"><td colspan="3">A — Material Supply</td></tr>
-          <tr class="sub-row"><td>Shell plates</td><td class="num">${roundTo(est.shellWeight,1)} t</td><td class="num">${SGD(est.mat_shell)}</td></tr>
-          <tr class="sub-row"><td>Structural steel — wind girder, stiffeners, top angle (12% of shell)</td><td class="num">${roundTo(est.structWeight,1)} t</td><td class="num">${SGD(est.mat_struct)}</td></tr>
-          <tr class="sub-row"><td>Bottom plates — annular + sketch plates</td><td class="num">${roundTo(est.bottomWeight,1)} t</td><td class="num">${SGD(est.mat_bottom)}</td></tr>
-          ${est.mat_outerRoof > 0 ? `<tr class="sub-row"><td>Outer roof plates (${LABELS.outerRoof[state.outerRoof]})</td><td class="num">${roundTo(est.outerRoofWeight,1)} t</td><td class="num">${SGD(est.mat_outerRoof)}</td></tr>` : ''}
-          ${est.mat_floatRoof > 0 ? `<tr class="sub-row"><td>Floating roof plates</td><td class="num">${roundTo(est.floatRoofWeight,1)} t</td><td class="num">${SGD(est.mat_floatRoof)}</td></tr>` : ''}
-          <tr class="subtotal-row"><td colspan="2">Material Supply Subtotal</td><td class="num">${SGD(est.mat_total)}</td></tr>
+          <tr class="sub-row"><td>Shell plates</td><td class="num">${roundTo(est.shellWeight,1)} t</td><td class="num">S$${COST_RATES.plate[matKey]}/t</td><td class="num">${SGD(est.mat_shell)}</td></tr>
+          <tr class="sub-row"><td>Structural steel — wind girder, stiffeners, top angle (12% of shell)</td><td class="num">${roundTo(est.structWeight,1)} t</td><td class="num">S$${COST_RATES.plate[matKey]}/t</td><td class="num">${SGD(est.mat_struct)}</td></tr>
+          <tr class="sub-row"><td>Bottom plates — annular + sketch plates</td><td class="num">${roundTo(est.bottomWeight,1)} t</td><td class="num">S$${COST_RATES.plate[matKey]}/t</td><td class="num">${SGD(est.mat_bottom)}</td></tr>
+          ${est.mat_outerRoof > 0 ? `<tr class="sub-row"><td>Outer roof plates (${LABELS.outerRoof[state.outerRoof]})</td><td class="num">${roundTo(est.outerRoofWeight,1)} t</td><td class="num">S$${COST_RATES.plate[matKey]}/t</td><td class="num">${SGD(est.mat_outerRoof)}</td></tr>` : ''}
+          ${est.mat_floatRoof > 0 ? `<tr class="sub-row"><td>Floating roof plates</td><td class="num">${roundTo(est.floatRoofWeight,1)} t</td><td class="num">S$${COST_RATES.plate[matKey]}/t</td><td class="num">${SGD(est.mat_floatRoof)}</td></tr>` : ''}
+          <tr class="subtotal-row"><td colspan="3">Material Supply Subtotal</td><td class="num">${SGD(est.mat_total)}</td></tr>
 
           <!-- B: Fabrication -->
           <tr class="cat-row"><td colspan="3">B — Fabrication (ex-yard, Malaysia)</td></tr>
-          <tr class="sub-row"><td>Shell fabrication — rolling, fit-up, welding, NDE</td><td class="num">${roundTo(est.shellWeight,1)} t</td><td class="num">${SGD(est.fab_shell)}</td></tr>
-          <tr class="sub-row"><td>Structural steel fabrication</td><td class="num">${roundTo(est.structWeight,1)} t</td><td class="num">${SGD(est.fab_struct)}</td></tr>
-          <tr class="sub-row"><td>Bottom plate fabrication</td><td class="num">${roundTo(est.bottomWeight,1)} t</td><td class="num">${SGD(est.fab_bottom)}</td></tr>
-          ${est.fab_outerRoof > 0 ? `<tr class="sub-row"><td>Outer roof fabrication${!state.frangibleRoof ? ' (non-frangible premium +7%)' : ''}</td><td class="num">${roundTo(est.outerRoofWeight,1)} t</td><td class="num">${SGD(est.fab_outerRoof)}</td></tr>` : ''}
-          ${showIFREFRFab ? `<tr class="sub-row"><td>Floating roof fabrication</td><td class="num">${roundTo(est.floatRoofWeight,1)} t</td><td class="num">${SGD(est.fab_floatRoof)}</td></tr>` : ''}
-          <tr class="subtotal-row"><td colspan="2">Fabrication Subtotal</td><td class="num">${SGD(est.fab_total)}</td></tr>
+          <tr class="sub-row"><td>Shell fabrication — rolling, fit-up, welding, NDE</td><td class="num">${roundTo(est.shellWeight,1)} t</td><td class="num">S$${COST_RATES.fabrication.shell[matType]}/t</td><td class="num">${SGD(est.fab_shell)}</td></tr>
+          <tr class="sub-row"><td>Structural steel fabrication</td><td class="num">${roundTo(est.structWeight,1)} t</td><td class="num">S$${COST_RATES.fabrication.structural[matType]}/t</td><td class="num">${SGD(est.fab_struct)}</td></tr>
+          <tr class="sub-row"><td>Bottom plate fabrication</td><td class="num">${roundTo(est.bottomWeight,1)} t</td><td class="num">S$${COST_RATES.fabrication.bottom[matType]}/t</td><td class="num">${SGD(est.fab_bottom)}</td></tr>
+          ${est.fab_outerRoof > 0 ? `<tr class="sub-row"><td>Outer roof fabrication${!state.frangibleRoof ? ' (non-frangible premium +7%)' : ''}</td><td class="num">${roundTo(est.outerRoofWeight,1)} t</td><td class="num">—</td><td class="num">${SGD(est.fab_outerRoof)}</td></tr>` : ''}
+          ${showIFREFRFab ? `<tr class="sub-row"><td>Floating roof fabrication</td><td class="num">${roundTo(est.floatRoofWeight,1)} t</td><td class="num">—</td><td class="num">${SGD(est.fab_floatRoof)}</td></tr>` : ''}
+          <tr class="subtotal-row"><td colspan="3">Fabrication Subtotal</td><td class="num">${SGD(est.fab_total)}</td></tr>
 
           <!-- C: Aluminium Dome -->
           ${showAlumDome ? `
           <tr class="cat-row"><td colspan="3">C — Aluminium Geodesic Dome (Vendor Supply &amp; Install)</td></tr>
-          <tr class="sub-row"><td>Vendor engineering, panels, framing &amp; site installation</td><td class="num">${roundTo(est.outerRoofArea,1)} m²</td><td class="num">${SGD(est.alumDomeCost)}</td></tr>
-          <tr class="subtotal-row"><td colspan="2">Aluminium Dome Subtotal</td><td class="num">${SGD(est.alumDomeCost)}</td></tr>` : ''}
+          <tr class="sub-row"><td>Vendor engineering, panels, framing &amp; site installation</td><td class="num">${roundTo(est.outerRoofArea,1)} m²</td><td class="num">S$${COST_RATES.aluminumDome.supplyAndInstall}/m²</td><td class="num">${SGD(est.alumDomeCost)}</td></tr>
+          <tr class="subtotal-row"><td colspan="3">Aluminium Dome Subtotal</td><td class="num">${SGD(est.alumDomeCost)}</td></tr>` : ''}
 
           <!-- D: Nozzles -->
           <tr class="cat-row"><td colspan="3">D — Nozzles &amp; Manholes</td></tr>
-          ${est.noz.shell_small  > 0 ? `<tr class="sub-row"><td>Shell nozzles ≤4" NPS — ${est.noz.shell_small} off</td><td class="num">${est.noz.shell_small} ea</td><td class="num">${SGD(est.noz_ss)}</td></tr>` : ''}
-          ${est.noz.shell_medium > 0 ? `<tr class="sub-row"><td>Shell nozzles 6"–10" NPS — ${est.noz.shell_medium} off</td><td class="num">${est.noz.shell_medium} ea</td><td class="num">${SGD(est.noz_sm)}</td></tr>` : ''}
-          ${est.noz.shell_large  > 0 ? `<tr class="sub-row"><td>Shell nozzles 12"–16" NPS — ${est.noz.shell_large} off</td><td class="num">${est.noz.shell_large} ea</td><td class="num">${SGD(est.noz_sl)}</td></tr>` : ''}
-          ${est.noz.shell_mh     > 0 ? `<tr class="sub-row"><td>Shell manholes 20"/24" — ${est.noz.shell_mh} off</td><td class="num">${est.noz.shell_mh} ea</td><td class="num">${SGD(est.noz_smh)}</td></tr>` : ''}
-          ${est.noz.roof_small   > 0 ? `<tr class="sub-row"><td>Roof nozzles ≤4" NPS — ${est.noz.roof_small} off</td><td class="num">${est.noz.roof_small} ea</td><td class="num">${SGD(est.noz_rs)}</td></tr>` : ''}
-          ${est.noz.roof_mh      > 0 ? `<tr class="sub-row"><td>Roof manholes 20" — ${est.noz.roof_mh} off</td><td class="num">${est.noz.roof_mh} ea</td><td class="num">${SGD(est.noz_rmh)}</td></tr>` : ''}
-          <tr class="subtotal-row"><td colspan="2">Nozzles &amp; Manholes Subtotal</td><td class="num">${SGD(est.noz_total)}</td></tr>
+          ${est.noz.shell_small  > 0 ? `<tr class="sub-row"><td>Shell nozzles ≤4" NPS — ${est.noz.shell_small} off</td><td class="num">${est.noz.shell_small} ea</td><td class="num">—</td><td class="num">${SGD(est.noz_ss)}</td></tr>` : ''}
+          ${est.noz.shell_medium > 0 ? `<tr class="sub-row"><td>Shell nozzles 6"–10" NPS — ${est.noz.shell_medium} off</td><td class="num">${est.noz.shell_medium} ea</td><td class="num">—</td><td class="num">${SGD(est.noz_sm)}</td></tr>` : ''}
+          ${est.noz.shell_large  > 0 ? `<tr class="sub-row"><td>Shell nozzles 12"–16" NPS — ${est.noz.shell_large} off</td><td class="num">${est.noz.shell_large} ea</td><td class="num">—</td><td class="num">${SGD(est.noz_sl)}</td></tr>` : ''}
+          ${est.noz.shell_mh     > 0 ? `<tr class="sub-row"><td>Shell manholes 20"/24" — ${est.noz.shell_mh} off</td><td class="num">${est.noz.shell_mh} ea</td><td class="num">—</td><td class="num">${SGD(est.noz_smh)}</td></tr>` : ''}
+          ${est.noz.roof_small   > 0 ? `<tr class="sub-row"><td>Roof nozzles ≤4" NPS — ${est.noz.roof_small} off</td><td class="num">${est.noz.roof_small} ea</td><td class="num">—</td><td class="num">${SGD(est.noz_rs)}</td></tr>` : ''}
+          ${est.noz.roof_mh      > 0 ? `<tr class="sub-row"><td>Roof manholes 20" — ${est.noz.roof_mh} off</td><td class="num">${est.noz.roof_mh} ea</td><td class="num">—</td><td class="num">${SGD(est.noz_rmh)}</td></tr>` : ''}
+          <tr class="subtotal-row"><td colspan="3">Nozzles &amp; Manholes Subtotal</td><td class="num">${SGD(est.noz_total)}</td></tr>
 
           <!-- E: Erection -->
           <tr class="cat-row"><td colspan="3">E — Site Erection, Singapore</td></tr>
-          <tr class="sub-row"><td>Erection labour &amp; crane (${LABELS.erection[state.erectionMethod]})</td><td class="num">${roundTo(est.totalSteelWeight,1)} t</td><td class="num">${SGD(est.erect_steel)}</td></tr>
-          ${est.erect_mob > 0 ? `<tr class="sub-row"><td>Jacking rig mobilisation (lump sum)</td><td class="num">1 LS</td><td class="num">${SGD(est.erect_mob)}</td></tr>` : ''}
-          <tr class="subtotal-row"><td colspan="2">Erection Subtotal</td><td class="num">${SGD(est.erect_total)}</td></tr>
+          <tr class="sub-row"><td>Erection labour &amp; crane (${LABELS.erection[state.erectionMethod]})</td><td class="num">${roundTo(est.totalSteelWeight,1)} t</td><td class="num">S$${COST_RATES.erection[state.erectionMethod][matType]}/t</td><td class="num">${SGD(est.erect_steel)}</td></tr>
+          ${est.erect_mob > 0 ? `<tr class="sub-row"><td>Jacking rig mobilisation (lump sum)</td><td class="num">1 LS</td><td class="num">LS</td><td class="num">${SGD(est.erect_mob)}</td></tr>` : ''}
+          <tr class="subtotal-row"><td colspan="3">Erection Subtotal</td><td class="num">${SGD(est.erect_total)}</td></tr>
 
           <!-- F: Painting -->
           <tr class="cat-row"><td colspan="3">F — Painting &amp; Coating</td></tr>
-          <tr class="sub-row"><td>Internal coating — ${LABELS.intCoat[state.internalCoating]} (shell, height ${roundTo(est.pAreas.paintH,1)} m)</td><td class="num">${roundTo(est.pAreas.internalShell,0)} m²</td><td class="num">${SGD(est.paint_int_shell)}</td></tr>
-          <tr class="sub-row"><td>Internal coating — ${LABELS.intCoat[state.internalCoating]} (bottom)</td><td class="num">${roundTo(est.pAreas.internalBottom,0)} m²</td><td class="num">${SGD(est.paint_int_bottom)}</td></tr>
-          <tr class="sub-row"><td>External coating — ${LABELS.extCoat[state.externalCoating]} (shell)</td><td class="num">${roundTo(est.pAreas.externalShell,0)} m²</td><td class="num">${SGD(est.paint_ext_shell)}</td></tr>
-          ${showExtRoofLine ? `<tr class="sub-row"><td>External coating — ${LABELS.extCoat[state.externalCoating]} (roof — higher rate for horizontal surface)</td><td class="num">${roundTo(est.pAreas.externalRoofArea,0)} m²</td><td class="num">${SGD(est.paint_ext_roof)}</td></tr>` : ''}
-          ${est.paint_float_top  > 0 ? `<tr class="sub-row"><td>Floating roof — top deck external coating</td><td class="num">${roundTo(est.floatDeckArea,0)} m²</td><td class="num">${SGD(est.paint_float_top)}</td></tr>` : ''}
-          ${est.paint_float_btm  > 0 ? `<tr class="sub-row"><td>Floating roof — underside (product contact) coating</td><td class="num">${roundTo(est.floatDeckArea,0)} m²</td><td class="num">${SGD(est.paint_float_btm)}</td></tr>` : ''}
-          <tr class="subtotal-row"><td colspan="2">Painting &amp; Coating Subtotal</td><td class="num">${SGD(est.paint_total)}</td></tr>
+          <tr class="sub-row"><td>Internal coating — ${LABELS.intCoat[state.internalCoating]} (shell, height ${roundTo(est.pAreas.paintH,1)} m)</td><td class="num">${roundTo(est.pAreas.internalShell,0)} m²</td><td class="num">S$${COST_RATES.painting.internal[state.internalCoating]}/m²</td><td class="num">${SGD(est.paint_int_shell)}</td></tr>
+          <tr class="sub-row"><td>Internal coating — ${LABELS.intCoat[state.internalCoating]} (bottom)</td><td class="num">${roundTo(est.pAreas.internalBottom,0)} m²</td><td class="num">S$${COST_RATES.painting.internal[state.internalCoating]}/m²</td><td class="num">${SGD(est.paint_int_bottom)}</td></tr>
+          <tr class="sub-row"><td>External coating — ${LABELS.extCoat[state.externalCoating]} (shell)</td><td class="num">${roundTo(est.pAreas.externalShell,0)} m²</td><td class="num">S$${COST_RATES.painting.externalShell[state.externalCoating]}/m²</td><td class="num">${SGD(est.paint_ext_shell)}</td></tr>
+          ${showExtRoofLine ? `<tr class="sub-row"><td>External coating — ${LABELS.extCoat[state.externalCoating]} (roof — higher rate for horizontal surface)</td><td class="num">${roundTo(est.pAreas.externalRoofArea,0)} m²</td><td class="num">S$${COST_RATES.painting.externalRoof[state.externalCoating]}/m²</td><td class="num">${SGD(est.paint_ext_roof)}</td></tr>` : ''}
+          ${est.paint_float_top  > 0 ? `<tr class="sub-row"><td>Floating roof — top deck external coating</td><td class="num">${roundTo(est.floatDeckArea,0)} m²</td><td class="num">S$${COST_RATES.painting.floatingRoofTop.CS}/m²</td><td class="num">${SGD(est.paint_float_top)}</td></tr>` : ''}
+          ${est.paint_float_btm  > 0 ? `<tr class="sub-row"><td>Floating roof — underside (product contact) coating</td><td class="num">${roundTo(est.floatDeckArea,0)} m²</td><td class="num">S$${COST_RATES.painting.floatingRoofUnderside.CS}/m²</td><td class="num">${SGD(est.paint_float_btm)}</td></tr>` : ''}
+          <tr class="subtotal-row"><td colspan="3">Painting &amp; Coating Subtotal</td><td class="num">${SGD(est.paint_total)}</td></tr>
 
           <!-- G: Accessories -->
           <tr class="cat-row"><td colspan="3">G — Accessories &amp; Structural Appurtenances</td></tr>
-          <tr class="sub-row"><td>${LABELS.stair[state.stairType]}</td><td class="num">${roundTo(est.H,1)} m height</td><td class="num">${SGD(est.stair_cost)}</td></tr>
-          ${est.hasRoofPlatform ? `<tr class="sub-row"><td>Roof / shell-top perimeter walkway (handrail + grating)</td><td class="num">${roundTo(PI * est.D,1)} m</td><td class="num">${SGD(est.platform_cost)}</td></tr>` : ''}
-          ${showRolling ? `<tr class="sub-row"><td>Rolling ladder (EFR access — guide rails, wheeled, self-levelling)</td><td class="num">${roundTo(est.H * 1.155,1)} m travel</td><td class="num">${SGD(est.rolling_cost)}</td></tr>` : ''}
-          <tr class="sub-row"><td>Drip ring (50×50×6 angle at bottom annular — per API 650 good practice)</td><td class="num">${roundTo(PI * est.D,1)} m</td><td class="num">${SGD(est.drip_cost)}</td></tr>
-          ${showAnchor ? `<tr class="sub-row"><td>Anchor chairs — ${est.anchorCheck.count} off (API 650 Appendix B wind uplift check)</td><td class="num">${est.anchorCheck.count} ea</td><td class="num">${SGD(est.anchor_cost)}</td></tr>` : `<tr class="sub-row"><td>Anchor chairs — not required (wind overturning check passed, API 650 App B)</td><td class="num">—</td><td class="num">${SGD(0)}</td></tr>`}
-          <tr class="subtotal-row"><td colspan="2">Accessories Subtotal</td><td class="num">${SGD(est.acc_total)}</td></tr>
+          <tr class="sub-row"><td>${LABELS.stair[state.stairType]}</td><td class="num">${roundTo(est.H,1)} m height</td><td class="num">—</td><td class="num">${SGD(est.stair_cost)}</td></tr>
+          ${est.hasRoofPlatform ? `<tr class="sub-row"><td>Roof / shell-top perimeter walkway (handrail + grating)</td><td class="num">${roundTo(PI * est.D,1)} m</td><td class="num">S$${COST_RATES.accessories.roofPlatform.perMeterCircumference}/m</td><td class="num">${SGD(est.platform_cost)}</td></tr>` : ''}
+          ${showRolling ? `<tr class="sub-row"><td>Rolling ladder (EFR access — guide rails, wheeled, self-levelling)</td><td class="num">${roundTo(est.H * 1.155,1)} m travel</td><td class="num">—</td><td class="num">${SGD(est.rolling_cost)}</td></tr>` : ''}
+          <tr class="sub-row"><td>Drip ring (50×50×6 angle at bottom annular — per API 650 good practice)</td><td class="num">${roundTo(PI * est.D,1)} m</td><td class="num">S$${COST_RATES.accessories.dripRing.perMeterCircumference}/m</td><td class="num">${SGD(est.drip_cost)}</td></tr>
+          ${showAnchor ? `<tr class="sub-row"><td>Anchor chairs — ${est.anchorCheck.count} off (API 650 Appendix B wind uplift check)</td><td class="num">${est.anchorCheck.count} ea</td><td class="num">—</td><td class="num">${SGD(est.anchor_cost)}</td></tr>` : `<tr class="sub-row"><td>Anchor chairs — not required (wind overturning check passed, API 650 App B)</td><td class="num">—</td><td class="num">—</td><td class="num">${SGD(0)}</td></tr>`}
+          <tr class="subtotal-row"><td colspan="3">Accessories Subtotal</td><td class="num">${SGD(est.acc_total)}</td></tr>
 
           <!-- H: Rim Seal -->
           ${showRimSeal ? `
           <tr class="cat-row"><td colspan="3">H — Rim Seal System</td></tr>
-          <tr class="sub-row"><td>${LABELS.rimSeal[state.rimSealType]} — ${est.efrPresent ? 'EFR' : 'IFR'}</td><td class="num">${roundTo(PI * est.D,1)} m circumference</td><td class="num">${SGD(est.rimSeal_cost)}</td></tr>
-          <tr class="subtotal-row"><td colspan="2">Rim Seal Subtotal</td><td class="num">${SGD(est.rimSeal_cost)}</td></tr>` : ''}
+          <tr class="sub-row"><td>${LABELS.rimSeal[state.rimSealType]} — ${est.efrPresent ? 'EFR' : 'IFR'}</td><td class="num">${roundTo(PI * est.D,1)} m circumference</td><td class="num">—</td><td class="num">${SGD(est.rimSeal_cost)}</td></tr>
+          <tr class="subtotal-row"><td colspan="3">Rim Seal Subtotal</td><td class="num">${SGD(est.rimSeal_cost)}</td></tr>` : ''}
 
           <!-- I: Fire Protection -->
           ${showFireSystem ? `
           <tr class="cat-row"><td colspan="3">I — Fire Protection System Piping (SS 532 ${LABELS.fluidClass[state.fluidClass]?.split('—')[0].trim()})</td></tr>
-          <tr class="sub-row"><td>System mobilisation, manifold, isolation valve, flanged tie-in at shell bottom</td><td class="num">1 LS</td><td class="num">${SGD(est.fireResult.lumpSum)}</td></tr>
-          <tr class="sub-row"><td>Vertical supply pipe (exterior of shell)</td><td class="num">${roundTo(est.H,1)} m</td><td class="num">${SGD(est.fireResult.verticalPipe)}</td></tr>
-          <tr class="sub-row"><td>Top-of-shell ring header + foam pourers / spray nozzles</td><td class="num">${roundTo(PI * est.D,1)} m</td><td class="num">${SGD(est.fireResult.ringHeader)}</td></tr>
-          ${est.fireResult.rimInjection > 0 ? `<tr class="sub-row"><td>EFR rim-seal foam injection system (Class I/II EFR requirement)</td><td class="num">${roundTo(PI * est.D,1)} m</td><td class="num">${SGD(est.fireResult.rimInjection)}</td></tr>` : ''}
-          <tr class="subtotal-row"><td colspan="2">Fire Protection Subtotal</td><td class="num">${SGD(est.fire_total)}</td></tr>` : ''}
+          <tr class="sub-row"><td>System mobilisation, manifold, isolation valve, flanged tie-in at shell bottom</td><td class="num">1 LS</td><td class="num">LS</td><td class="num">${SGD(est.fireResult.lumpSum)}</td></tr>
+          <tr class="sub-row"><td>Vertical supply pipe (exterior of shell)</td><td class="num">${roundTo(est.H,1)} m</td><td class="num">—</td><td class="num">${SGD(est.fireResult.verticalPipe)}</td></tr>
+          <tr class="sub-row"><td>Top-of-shell ring header + foam pourers / spray nozzles</td><td class="num">${roundTo(PI * est.D,1)} m</td><td class="num">—</td><td class="num">${SGD(est.fireResult.ringHeader)}</td></tr>
+          ${est.fireResult.rimInjection > 0 ? `<tr class="sub-row"><td>EFR rim-seal foam injection system (Class I/II EFR requirement)</td><td class="num">${roundTo(PI * est.D,1)} m</td><td class="num">—</td><td class="num">${SGD(est.fireResult.rimInjection)}</td></tr>` : ''}
+          <tr class="subtotal-row"><td colspan="3">Fire Protection Subtotal</td><td class="num">${SGD(est.fire_total)}</td></tr>` : ''}
 
           <!-- J: Freight -->
           <tr class="cat-row"><td colspan="3">${showFireSystem ? 'J' : showRimSeal ? 'I' : 'H'} — Freight</td></tr>
-          <tr class="sub-row"><td>Transport (${LABELS.freight[state.freightOption]})</td><td class="num">${roundTo(est.totalSteelWeight,1)} t</td><td class="num">${SGD(est.freight_total)}</td></tr>
-          <tr class="subtotal-row"><td colspan="2">Freight Subtotal</td><td class="num">${SGD(est.freight_total)}</td></tr>
+          <tr class="sub-row"><td>Transport (${LABELS.freight[state.freightOption]})</td><td class="num">${roundTo(est.totalSteelWeight,1)} t</td><td class="num">S$${COST_RATES.freight[state.freightOption].perTonne}/t + LS</td><td class="num">${SGD(est.freight_total)}</td></tr>
+          <tr class="subtotal-row"><td colspan="3">Freight Subtotal</td><td class="num">${SGD(est.freight_total)}</td></tr>
 
           <!-- K: Hydrotest -->
           <tr class="cat-row"><td colspan="3">Hydrostatic Test (mandatory — API 650 §7.3.6)</td></tr>
-          <tr class="sub-row"><td>Test supervision, equipment &amp; water supply</td><td class="num">${Math.round(est.capacity).toLocaleString()} m³</td><td class="num">${SGD(est.hydrotest_total)}</td></tr>
-          <tr class="subtotal-row"><td colspan="2">Hydrotest Subtotal</td><td class="num">${SGD(est.hydrotest_total)}</td></tr>
+          <tr class="sub-row"><td>Test supervision, equipment &amp; water supply</td><td class="num">${Math.round(est.capacity).toLocaleString()} m³</td><td class="num">S$${COST_RATES.hydrotest.perCubicMetre}/m³ + LS</td><td class="num">${SGD(est.hydrotest_total)}</td></tr>
+          <tr class="subtotal-row"><td colspan="3">Hydrotest Subtotal</td><td class="num">${SGD(est.hydrotest_total)}</td></tr>
 
           <!-- Totals -->
           <tr><td colspan="3" style="padding:6px 0;"></td></tr>
           <tr class="subtotal-row"><td colspan="2" style="font-size:14px;">Subtotal (before contingency)</td><td class="num" style="font-size:14px;">${SGD(est.subtotal)}</td></tr>
-          <tr class="contingency-row"><td colspan="2">Contingency (${contingencyPct}%)</td><td class="num">${SGD(contingencyAmt)}</td></tr>
-          <tr class="total-row"><td colspan="2">TOTAL ESTIMATED PROJECT COST</td><td class="num">${SGD(grandTotal)}</td></tr>
+          <tr class="contingency-row"><td colspan="3">Contingency (${contingencyPct}%)</td><td class="num">${SGD(contingencyAmt)}</td></tr>
+          <tr class="total-row"><td colspan="3">TOTAL ESTIMATED PROJECT COST</td><td class="num">${SGD(grandTotal)}</td></tr>
 
         </tbody>
       </table>
@@ -453,18 +453,53 @@ function renderOutput() {
       </div>
     </div>
 
-    <!-- Basis of Estimate -->
+    <!-- Basis of Calculations -->
     <div class="card">
-      <div class="card-title">Basis of Estimate</div>
-      <div style="font-size:12px;color:var(--text-sec);line-height:2;">
-        <p><strong>Design standard:</strong> API 650, 12th Edition. Shell thickness by one-foot method (§5.6.3, metric).</p>
-        <p><strong>Cone roof configuration:</strong> ${est.coneIsSelfSupporting ? `D ≤ 12 m — self-supporting cone assumed (no internal rafters, min plate 6 mm). Structural analysis should confirm for final design.` : `D > 12 m — rafter-supported cone assumed (internal rafters, min plate 5 mm). Rafter steel captured in 12% structural allowance.`}</p>
-        <p><strong>Structural allowance:</strong> 12% of shell weight, covering wind girder, intermediate stiffener rings, top angle, and shell appurtenances.</p>
-        <p><strong>Anchorage:</strong> ${est.anchorCheck.required ? `Required — ${est.anchorCheck.count} anchor chairs per API 650 Appendix B wind uplift check (Mw = ${Math.round(est.anchorCheck.Mw/1000)} kN·m vs Mstab = ${Math.round((est.anchorCheck.Ml + est.anchorCheck.Ms)/1000)} kN·m).` : `Not required — wind overturning moment (${Math.round(est.anchorCheck.Mw/1000)} kN·m) < stabilising moments (${Math.round((est.anchorCheck.Ml + est.anchorCheck.Ms)/1000)} kN·m) per API 650 Appendix B.`}</p>
-        <p><strong>Fire protection:</strong> Classified per SS 532. Scope covers tank-side piping only — ring header, vertical supply, and flanged tie-in at tank shell. Main fire water/foam ring main excluded.</p>
-        <p><strong>Cost rates basis:</strong> Estimated SE Asia market, Q1 2025 (SGD). Rates are assumed and not yet validated against completed project data. Accuracy: ±20–25%.</p>
-        <p><strong>Prepared by:</strong> API 650 Tank Cost Estimator ${APP_VERSION} &nbsp;|&nbsp; ${dateStr}</p>
-      </div>
+      <div class="card-title">Basis of Calculations</div>
+      <div style="font-size:12px;color:var(--text-sec);margin-bottom:14px;">All quantities derived per API 650, 12th Edition. Intermediate values shown below.</div>
+      <table class="basis-table">
+        <thead><tr><th>Parameter</th><th>Formula / Derivation</th></tr></thead>
+        <tbody>
+          <tr class="basis-section"><td colspan="2"><strong>Tank Geometry</strong></td></tr>
+          <tr><td>Shell area</td><td>π × D × H = π × ${est.D} × ${est.H} = <strong>${roundTo(Math.PI*est.D*est.H,1)} m²</strong></td></tr>
+          <tr><td>Bottom area</td><td>π/4 × D² = π/4 × ${est.D}² = <strong>${roundTo(Math.PI/4*est.D*est.D,1)} m²</strong></td></tr>
+          <tr><td>Gross capacity</td><td>π/4 × D² × H = <strong>${Math.round(est.capacity).toLocaleString()} m³</strong></td></tr>
+          <tr><td>Tank circumference</td><td>π × D = <strong>${roundTo(Math.PI*est.D,1)} m</strong></td></tr>
+          ${!est.isAlumDome && state.outerRoof !== 'efr' && state.outerRoof !== 'openTop' ? `<tr><td>Roof area (${LABELS.outerRoof[state.outerRoof]})</td><td>Slant height geometry → <strong>${roundTo(est.outerRoofArea,1)} m²</strong></td></tr>` : ''}
+          ${est.hasFloatRoof ? `<tr><td>Floating roof deck area</td><td>π/4 × D² (approx.) = <strong>${roundTo(est.floatDeckArea,1)} m²</strong></td></tr>` : ''}
+
+          <tr class="basis-section"><td colspan="2"><strong>Shell Design — API 650 One-Foot Method (§5.6.3)</strong></td></tr>
+          <tr><td>Shell courses</td><td>${est.courses.map((c,i)=>`Course ${i+1}: ${c.height} m, t_des=${c.t_design.toFixed(2)} mm → t_ord=${c.t_ordered} mm`).join(' | ')}</td></tr>
+          <tr><td>Shell weight</td><td>Σ(area per course × t_ordered × 7.85 t/m³) = <strong>${roundTo(est.shellWeight,2)} t</strong></td></tr>
+          <tr><td>Structural steel (12% allowance)</td><td>12% × shell weight = 0.12 × ${roundTo(est.shellWeight,2)} = <strong>${roundTo(est.structWeight,2)} t</strong> (wind girder, stiffeners, top angle)</td></tr>
+
+          <tr class="basis-section"><td colspan="2"><strong>Bottom Plate Weight</strong></td></tr>
+          <tr><td>Bottom weight</td><td>Sketch + annular plates. Area = π/4 × D² + 0.6 m overlap. t = max(6, CA) mm + min tck per API 650. Result: <strong>${roundTo(est.bottomWeight,2)} t</strong></td></tr>
+
+          <tr class="basis-section"><td colspan="2"><strong>Roof Weight</strong></td></tr>
+          ${est.isAlumDome ? `<tr><td>Aluminium dome</td><td>Vendor supply + install. Area = ${roundTo(est.outerRoofArea,1)} m² × S$${COST_RATES.aluminumDome.supplyAndInstall}/m²</td></tr>` : `<tr><td>Outer roof weight</td><td>${est.coneIsSelfSupporting ? 'Self-supporting cone (D ≤ 12 m, no rafters, t_min = 6 mm)' : 'Rafter-supported cone/dome (D > 12 m, t_min = 5 mm)'}. Result: <strong>${roundTo(est.outerRoofWeight,2)} t</strong></td></tr>`}
+          ${est.hasFloatRoof ? `<tr><td>Floating roof weight</td><td>Deck + pontoon geometry. Result: <strong>${roundTo(est.floatRoofWeight,2)} t</strong></td></tr>` : ''}
+          <tr><td>Total steel weight</td><td>Shell + Struct + Bottom + Roof + Float = <strong>${roundTo(est.totalSteelWeight,2)} t</strong></td></tr>
+
+          <tr class="basis-section"><td colspan="2"><strong>Painting Areas</strong></td></tr>
+          <tr><td>Internal shell paint area</td><td>π × D × paintH = π × ${est.D} × ${roundTo(est.pAreas.paintH,1)} = <strong>${roundTo(est.pAreas.internalShell,1)} m²</strong></td></tr>
+          <tr><td>Internal bottom paint area</td><td>π/4 × D² = <strong>${roundTo(est.pAreas.internalBottom,1)} m²</strong></td></tr>
+          <tr><td>External shell paint area</td><td>π × D × H = <strong>${roundTo(est.pAreas.externalShell,1)} m²</strong></td></tr>
+          ${est.paint_ext_roof > 0 ? `<tr><td>External roof paint area</td><td>Roof surface geometry = <strong>${roundTo(est.pAreas.externalRoofArea,1)} m²</strong> (higher rate — horizontal surface)</td></tr>` : ''}
+
+          <tr class="basis-section"><td colspan="2"><strong>Anchorage — API 650 Appendix B</strong></td></tr>
+          <tr><td>Wind overturning moment Mw</td><td><strong>${Math.round(est.anchorCheck.Mw/1000)} kN·m</strong> (wind on shell at ${state.windSpeed} m/s)</td></tr>
+          <tr><td>Stabilising moments</td><td>Liquid Ml = ${Math.round(est.anchorCheck.Ml/1000)} kN·m | Shell Ms = ${Math.round(est.anchorCheck.Ms/1000)} kN·m | Total = <strong>${Math.round((est.anchorCheck.Ml+est.anchorCheck.Ms)/1000)} kN·m</strong></td></tr>
+          <tr><td>Anchor chairs</td><td>${est.anchorCheck.required ? `Required: ${est.anchorCheck.count} chairs (Mw > Mstab)` : 'Not required (Mw < Mstab)'}</td></tr>
+
+          <tr class="basis-section"><td colspan="2"><strong>Cost Rates Basis</strong></td></tr>
+          <tr><td>Plate material</td><td>${matKey} @ S$${COST_RATES.plate[matKey]}/t delivered to fab yard</td></tr>
+          <tr><td>Fabrication (shell)</td><td>S$${COST_RATES.fabrication.shell[matType]}/t ex-yard Malaysia</td></tr>
+          <tr><td>Site erection</td><td>S$${COST_RATES.erection[state.erectionMethod][matType]}/t — ${LABELS.erection[state.erectionMethod]}</td></tr>
+          <tr><td>Currency / Basis</td><td>SGD. SE Asia market, Q1 2025 (assumed). Accuracy ±20–25%.</td></tr>
+          <tr><td>Prepared by</td><td>API 650 Tank Cost Estimator ${APP_VERSION} | ${dateStr}</td></tr>
+        </tbody>
+      </table>
     </div>
   `;
 

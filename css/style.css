@@ -386,3 +386,85 @@ input.error { border-color: var(--danger); }
 
 /* ── REPAIR DETAIL CARDS ────────────────────────────────────────────────── */
 .repair-detail-card { margin-bottom: 20px; }
+
+/* ── SETTINGS PAGE ────────────────────────────────────────────────────────── */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px 20px;
+}
+.sg-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.sg-item label {
+  flex: 1;
+  color: var(--text-sec);
+  min-width: 0;
+  font-size: 12px;
+}
+.sg-item input[type="number"] {
+  width: 90px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.sg-unit {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 60px;
+}
+.sg-item.sg-wide { grid-column: span 1; }
+
+/* ── BASIS OF CALCULATIONS TABLE ─────────────────────────────────────────── */
+.basis-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.basis-table th {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-muted);
+  padding: 8px 12px; text-align: left; border-bottom: 2px solid var(--border);
+}
+.basis-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text-sec);
+  line-height: 1.5;
+}
+.basis-table td:first-child {
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  width: 220px;
+}
+.basis-table tr.basis-section td {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-weight: 600;
+  padding: 8px 12px;
+}
+
+/* ── LABOUR SECTION HEADER IN REPAIR OUTPUT ──────────────────────────────── */
+.labour-section-header td {
+  color: var(--text-muted) !important;
+  font-style: italic;
+  font-size: 12px;
+  padding-top: 6px !important;
+}
+
+/* ── COST TABLE 4-COLUMN (unit rate column) ──────────────────────────────── */
+.cost-table th:nth-child(3),
+.cost-table td:nth-child(3) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}

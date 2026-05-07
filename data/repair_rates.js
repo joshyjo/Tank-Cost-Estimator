@@ -36,7 +36,11 @@ const REPAIR_RATES = {
     },
     internal: {
       perM3:           13    // SGD/m3 — tower scaffold hire + materials inside tank
-    }
+    },
+    // Maximum scaffold height for IFR/EFR works (R01,R02,R03,R08).
+    // IFR/EFR deck is at low level — scaffold only needs to reach ~4 m.
+    // Editable via cost input page (stored in localStorage).
+    ifrEfrMaxScaffoldHeight: 4   // m — default 4 m
   },
 
   // ---------------------------------------------------------------------------

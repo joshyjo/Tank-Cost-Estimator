@@ -324,6 +324,70 @@ COST_RATES.labour = {
   },
 
   // ---------------------------------------------------------------------------
+  // SITE INSTALLATION MANHOURS per scope quantity
+  // These are IN ADDITION to shop fabrication MH (unitMH) above.
+  // Applies to steel work assembled/welded at site.
+  // Scopes with BOTH shop + site MH: R01,R03,R04,R05,R06,R07,R09,R12,R13,R15
+  // Scopes with ONLY site MH (no shop fab component): R02,R08,R10,R11,R14
+  // ---------------------------------------------------------------------------
+  siteMH: {
+
+    // Shell plate replacement — per tonne erected at site
+    shellRepair:         { WLD: 12, FTR: 10, RIG:  8, FMN: 3, HLP: 4 },
+
+    // Bottom plate replacement — per tonne laid at site
+    bottomRepair:        { WLD: 10, FTR:  8, RIG:  6, FMN: 2, HLP: 4 },
+    bottomFullReplace:   { WLD: 14, FTR: 10, RIG:  8, FMN: 3, HLP: 5 },
+
+    // Cone/dome roof — per tonne erected at site
+    roofRepair:          { WLD: 14, FTR: 10, RIG:  8, FMN: 3, HLP: 4 },
+
+    // Floating roof removal at site — per tonne (cutting + rigging only)
+    floatRoofRemove:     { WLD:  2, FTR:  4, RIG:  6, FMN: 2, HLP: 5 },
+
+    // IFR/EFR assembly and installation at site — per tonne
+    floatRoofAddIFR:     { WLD: 12, FTR: 10, RIG:  6, FMN: 3, HLP: 4 },
+
+    // IFR/EFR deck patch or repair at site — per tonne
+    floatRoofRepairDeck: { WLD: 12, FTR: 10, RIG:  6, FMN: 3, HLP: 4 },
+
+    // Support leg replacement at site — per leg
+    legReplace:          { WLD:  3, FTR:  3, RIG:  2, FMN: 1, HLP: 2 },
+
+    // Nozzle cut-in at site — per unit by size band
+    nozzleCutIn: {
+      small:   { WLD:  6, FTR:  5, RIG: 2, FMN: 1, HLP: 2 },
+      medium:  { WLD: 10, FTR:  8, RIG: 3, FMN: 2, HLP: 3 },
+      large:   { WLD: 16, FTR: 12, RIG: 5, FMN: 3, HLP: 4 },
+      manhole: { WLD: 20, FTR: 15, RIG: 6, FMN: 4, HLP: 4 }
+    },
+
+    // Rim seal removal + reinstall at site — per metre of circumference
+    rimSealRR:     { FTR: 1.2, FMN: 0.3, HLP: 0.8 },
+
+    // Stilling well installation at site — per metre of pipe length
+    stillingWell:  { WLD: 1.5, FTR: 1.5, RIG: 1.0, FMN: 0.5, HLP: 1.0 },
+
+    // CP anode installation at site — per anode
+    cpAnode:       {            FTR: 1.5,             FMN: 0.3, HLP: 1.0 },
+
+    // Vent installation at site — per unit
+    ventInstall:   { WLD: 2.5, FTR: 2.0, RIG: 1.0, FMN: 0.5, HLP: 1.0 },
+
+    // Wind girder addition at site — per tonne
+    windGirder:    { WLD: 14,  FTR: 10,  RIG:  8,  FMN: 3,   HLP: 4   },
+
+    // Staircase/ladder addition at site — per metre of shell height
+    stairAdd:      { WLD:  6,  FTR:  5,  RIG:  3,  FMN: 1,   HLP: 2   },
+
+    // Roof/shell-top platform addition at site — per metre of circumference
+    platformAdd:   { WLD:  5,  FTR:  4,  RIG:  3,  FMN: 1,   HLP: 2   },
+
+    // Aluminium dome — vendor installs; site supervision + rigging only
+    alumDomeInstall: {          FTR: 6,   RIG:  8,  FMN: 3,   HLP: 4   }
+  },
+
+  // ---------------------------------------------------------------------------
   // INDIRECT LABOUR RATIO
   // Indirect MH = indirectPct x total direct MH.
   // Covers Safety Officer, QC Inspector time.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tank Cost Estimator v1.2.0</title>
+  <title>Tank Cost Estimator v1.3.0</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="data/materials.js"></script>
   <script src="data/cost_rates.js"></script>
@@ -14,6 +14,7 @@
   <script src="js/repair/repair_calculations.js"></script>
   <script src="js/repair/repair_output.js"></script>
   <script src="js/repair/repair_app.js"></script>
+  <script src="js/settings.js"></script>
 </head>
 <body>
 
@@ -22,7 +23,10 @@
     <h1>API 650 Tank Cost Estimator</h1>
     <p>Indicative project cost estimation for aboveground atmospheric storage tanks</p>
   </div>
-  <span id="version-badge">v1.2.0</span>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span id="version-badge">v1.3.0</span>
+    <button class="btn btn-secondary" onclick="openSettings()" style="padding:6px 14px;font-size:12px;background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);" title="Cost Input Settings">⚙ Cost Rates</button>
+  </div>
 </header>
 
 
@@ -47,6 +51,185 @@
     </div>
   </div>
 </div>
+<!-- ═══ COST INPUT / SETTINGS PAGE ══════════════════════════════════════════ -->
+<div id="settings-wrapper" style="display:none;">
+<div id="app-body">
+<nav id="sidebar">
+  <ul class="step-nav">
+    <li style="padding:16px 14px;"><div class="step-info"><div class="step-label">Settings</div><div class="step-name">Cost Rates</div></div></li>
+  </ul>
+  <div style="padding:16px;border-top:1px solid var(--border);margin-top:auto;">
+    <button class="btn btn-secondary" onclick="closeSettings()" style="width:100%;">← Back to Home</button>
+  </div>
+</nav>
+<main id="main" style="max-width:900px;">
+  <div class="step-header">
+    <h2>Cost Rate Input</h2>
+    <p>All rates are stored in your browser (localStorage) and persist between sessions. Click <strong>Save Rates</strong> to apply. Use <strong>Export JS File</strong> as backup.</p>
+  </div>
+
+  <div class="notice warn"><span class="notice-icon">⚠</span><div>These rates are <strong>assumed SE Asia market values (Q1 2025, SGD)</strong>. Calibrate against completed project data before use in tenders.</div></div>
+
+  <!-- MATERIAL COSTS -->
+  <div class="card">
+    <div class="card-title">Material Cost — Plate Supply (SGD/tonne, delivered to fab yard)</div>
+    <div class="settings-grid">
+      <div class="sg-item"><label>CS — A36</label><input type="number" data-rate-path="CR.plate.CS-A36"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>CS — A516 Gr.60</label><input type="number" data-rate-path="CR.plate.CS-A516-60"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>CS — A516 Gr.70</label><input type="number" data-rate-path="CR.plate.CS-A516-70"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>SS — 304</label><input type="number" data-rate-path="CR.plate.SS-304"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>SS — 316</label><input type="number" data-rate-path="CR.plate.SS-316"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>SS — 316L</label><input type="number" data-rate-path="CR.plate.SS-316L"><span class="sg-unit">SGD/t</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Material Cost — Stilling Well Pipe (SGD/tonne)</div>
+    <div class="settings-grid">
+      <div class="sg-item"><label>CS pipe</label><input type="number" data-rate-path="RR.stillingWell.materialRatePerTonne.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>SS pipe</label><input type="number" data-rate-path="RR.stillingWell.materialRatePerTonne.SS"><span class="sg-unit">SGD/t</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Material Cost — Vendor Supply Items</div>
+    <div class="settings-grid">
+      <div class="sg-item"><label>Aluminium dome (supply + install)</label><input type="number" data-rate-path="CR.aluminumDome.supplyAndInstall"><span class="sg-unit">SGD/m²</span></div>
+      <div class="sg-item"><label>Rim seal — primary (IFR)</label><input type="number" data-rate-path="CR.rimSeal.primary.IFR"><span class="sg-unit">SGD/m circ.</span></div>
+      <div class="sg-item"><label>Rim seal — primary (EFR)</label><input type="number" data-rate-path="CR.rimSeal.primary.EFR"><span class="sg-unit">SGD/m circ.</span></div>
+      <div class="sg-item"><label>Rim seal — prim+sec (IFR)</label><input type="number" data-rate-path="CR.rimSeal.primarySecondary.IFR"><span class="sg-unit">SGD/m circ.</span></div>
+      <div class="sg-item"><label>Rim seal — prim+sec (EFR)</label><input type="number" data-rate-path="CR.rimSeal.primarySecondary.EFR"><span class="sg-unit">SGD/m circ.</span></div>
+      <div class="sg-item"><label>CP anode material (Mg)</label><input type="number" data-rate-path="RR.cp.materialPerKg"><span class="sg-unit">SGD/kg</span></div>
+      <div class="sg-item"><label>Bleeder vent supply</label><input type="number" data-rate-path="RR.ifrRepair.bleederVentSupply"><span class="sg-unit">SGD/ea</span></div>
+      <div class="sg-item"><label>Vacuum breaker supply</label><input type="number" data-rate-path="RR.ifrRepair.vacuumBreakerSupply"><span class="sg-unit">SGD/ea</span></div>
+      <div class="sg-item"><label>P/V vent supply (CS)</label><input type="number" data-rate-path="RR.venting.pvVent.supply"><span class="sg-unit">SGD/ea</span></div>
+      <div class="sg-item"><label>Emergency vent supply (CS)</label><input type="number" data-rate-path="RR.venting.emergencyVent.supply"><span class="sg-unit">SGD/ea</span></div>
+    </div>
+  </div>
+
+  <!-- FABRICATION -->
+  <div class="card">
+    <div class="card-title">Fabrication Cost — Ex-Yard Malaysia (SGD/tonne)</div>
+    <div class="settings-grid">
+      <div class="sg-item"><label>Shell — CS</label><input type="number" data-rate-path="CR.fabrication.shell.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Shell — SS</label><input type="number" data-rate-path="CR.fabrication.shell.SS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Bottom — CS</label><input type="number" data-rate-path="CR.fabrication.bottom.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Bottom — SS</label><input type="number" data-rate-path="CR.fabrication.bottom.SS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Cone Roof — CS</label><input type="number" data-rate-path="CR.fabrication.coneRoof.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Cone Roof — SS</label><input type="number" data-rate-path="CR.fabrication.coneRoof.SS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Dome Roof — CS</label><input type="number" data-rate-path="CR.fabrication.domeRoof.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Dome Roof — SS</label><input type="number" data-rate-path="CR.fabrication.domeRoof.SS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Structural — CS</label><input type="number" data-rate-path="CR.fabrication.structural.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Structural — SS</label><input type="number" data-rate-path="CR.fabrication.structural.SS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>IFR Pontoon</label><input type="number" data-rate-path="CR.fabrication.ifrPontoon.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>IFR Full Contact</label><input type="number" data-rate-path="CR.fabrication.ifrFullContact.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>EFR Single Deck</label><input type="number" data-rate-path="CR.fabrication.efrSingleDeck.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>EFR Double Deck</label><input type="number" data-rate-path="CR.fabrication.efrDoubleDeck.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Repair shop premium</label><input type="number" step="0.01" data-rate-path="RR.repairShopPremium"><span class="sg-unit">fraction (e.g. 0.05)</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Painting / Coating (SGD/m²)</div>
+    <div class="settings-grid">
+      <div class="sg-item"><label>Internal — Epoxy 2-coat</label><input type="number" data-rate-path="CR.painting.internal.epoxy2coat"><span class="sg-unit">SGD/m²</span></div>
+      <div class="sg-item"><label>Internal — Glass flake</label><input type="number" data-rate-path="CR.painting.internal.glassFlake"><span class="sg-unit">SGD/m²</span></div>
+      <div class="sg-item"><label>Internal — Passivation (SS)</label><input type="number" data-rate-path="CR.painting.internal.passivation"><span class="sg-unit">SGD/m²</span></div>
+      <div class="sg-item"><label>External shell — Standard</label><input type="number" data-rate-path="CR.painting.externalShell.standard"><span class="sg-unit">SGD/m²</span></div>
+      <div class="sg-item"><label>External shell — Premium</label><input type="number" data-rate-path="CR.painting.externalShell.premium"><span class="sg-unit">SGD/m²</span></div>
+      <div class="sg-item"><label>External roof — Standard</label><input type="number" data-rate-path="CR.painting.externalRoof.standard"><span class="sg-unit">SGD/m²</span></div>
+      <div class="sg-item"><label>External roof — Premium</label><input type="number" data-rate-path="CR.painting.externalRoof.premium"><span class="sg-unit">SGD/m²</span></div>
+      <div class="sg-item"><label>Float roof top (CS)</label><input type="number" data-rate-path="CR.painting.floatingRoofTop.CS"><span class="sg-unit">SGD/m²</span></div>
+      <div class="sg-item"><label>Float roof underside (CS)</label><input type="number" data-rate-path="CR.painting.floatingRoofUnderside.CS"><span class="sg-unit">SGD/m²</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Site Erection &amp; Equipment Cost (SGD/tonne)</div>
+    <div class="settings-grid">
+      <div class="sg-item"><label>Erection traditional — CS</label><input type="number" data-rate-path="CR.erection.traditional.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Erection traditional — SS</label><input type="number" data-rate-path="CR.erection.traditional.SS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Erection jacking — CS</label><input type="number" data-rate-path="CR.erection.jacking.CS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Erection jacking — SS</label><input type="number" data-rate-path="CR.erection.jacking.SS"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Jacking rig mobilisation</label><input type="number" data-rate-path="CR.erection.jacking.mobilisationLumpSum"><span class="sg-unit">SGD LS</span></div>
+    </div>
+    <div class="settings-grid" style="margin-top:14px;">
+      <div class="sg-item"><label>Scaffold external (hire)</label><input type="number" data-rate-path="RR.scaffolding.external.perM3"><span class="sg-unit">SGD/m³</span></div>
+      <div class="sg-item"><label>Scaffold platform (hire)</label><input type="number" data-rate-path="RR.scaffolding.external.platformPerM2"><span class="sg-unit">SGD/m²</span></div>
+      <div class="sg-item"><label>Scaffold internal (hire)</label><input type="number" data-rate-path="RR.scaffolding.internal.perM3"><span class="sg-unit">SGD/m³</span></div>
+      <div class="sg-item"><label>IFR/EFR max scaffold height</label><input type="number" step="0.5" data-rate-path="RR.scaffolding.ifrEfrMaxScaffoldHeight"><span class="sg-unit">m (default 4 m)</span></div>
+      <div class="sg-item"><label>Tank jacking base cost</label><input type="number" data-rate-path="RR.jacking.baseLumpSum"><span class="sg-unit">SGD LS</span></div>
+      <div class="sg-item"><label>Tank jacking per m circumference</label><input type="number" data-rate-path="RR.jacking.perMCircumference"><span class="sg-unit">SGD/m</span></div>
+      <div class="sg-item"><label>Freight MYS→SG (per tonne)</label><input type="number" data-rate-path="CR.freight.mysSg.perTonne"><span class="sg-unit">SGD/t</span></div>
+      <div class="sg-item"><label>Freight MYS→SG (lump sum)</label><input type="number" data-rate-path="CR.freight.mysSg.lumpSum"><span class="sg-unit">SGD LS</span></div>
+      <div class="sg-item"><label>Freight local SG (per tonne)</label><input type="number" data-rate-path="CR.freight.localSg.perTonne"><span class="sg-unit">SGD/t</span></div>
+    </div>
+  </div>
+
+  <!-- LABOUR RATES -->
+  <div class="card">
+    <div class="card-title">Labour Cost — Trade Rates (SGD/hr, all-in subcontractor)</div>
+    <div class="settings-grid">
+      <div class="sg-item"><label>Welder (WLD)</label><input type="number" data-rate-path="CR.labour.rates.WLD"><span class="sg-unit">SGD/hr</span></div>
+      <div class="sg-item"><label>Fitter (FTR)</label><input type="number" data-rate-path="CR.labour.rates.FTR"><span class="sg-unit">SGD/hr</span></div>
+      <div class="sg-item"><label>Rigger (RIG)</label><input type="number" data-rate-path="CR.labour.rates.RIG"><span class="sg-unit">SGD/hr</span></div>
+      <div class="sg-item"><label>Scaffolder (SCF)</label><input type="number" data-rate-path="CR.labour.rates.SCF"><span class="sg-unit">SGD/hr</span></div>
+      <div class="sg-item"><label>Foreman (FMN)</label><input type="number" data-rate-path="CR.labour.rates.FMN"><span class="sg-unit">SGD/hr</span></div>
+      <div class="sg-item"><label>Helper (HLP)</label><input type="number" data-rate-path="CR.labour.rates.HLP"><span class="sg-unit">SGD/hr</span></div>
+      <div class="sg-item"><label>Indirect (IND) — SO/QC blended</label><input type="number" data-rate-path="CR.labour.rates.IND"><span class="sg-unit">SGD/hr</span></div>
+      <div class="sg-item"><label>Indirect labour ratio</label><input type="number" step="0.01" data-rate-path="CR.labour.indirectPct"><span class="sg-unit">fraction (e.g. 0.25)</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Labour Norms — Shop Fabrication MH (per scope unit)</div>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Basis: Welder productivity 60 mm/min/pass (site butt welds). These are shop fab norms only.</p>
+    <div class="settings-grid">
+      <div class="sg-item sg-wide"><label>Shell repair (WLD MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.unitMH.shellRepair.WLD"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Shell repair (FTR MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.unitMH.shellRepair.FTR"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Bottom repair (WLD MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.unitMH.bottomRepair.WLD"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Bottom full replace (WLD MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.unitMH.bottomFullReplace.WLD"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Roof repair (WLD MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.unitMH.roofRepair.WLD"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>IFR add — shop (WLD MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.unitMH.floatRoofAddIFR.WLD"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Float roof remove (FTR MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.unitMH.floatRoofRemove.FTR"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Stilling well (WLD MH/m)</label><input type="number" step="0.1" data-rate-path="CR.labour.unitMH.stillingWell.WLD"><span class="sg-unit">MH/m</span></div>
+      <div class="sg-item sg-wide"><label>Scaffolder MH per m³</label><input type="number" step="0.01" data-rate-path="CR.labour.scfMHperM3"><span class="sg-unit">MH/m³</span></div>
+      <div class="sg-item sg-wide"><label>Scaffolder MH per m² (platform)</label><input type="number" step="0.01" data-rate-path="CR.labour.scfMHperM2"><span class="sg-unit">MH/m²</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Labour Norms — Site Installation MH (per scope unit)</div>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Applied in addition to shop fab MH. Covers field fit-up, welding, rigging at site.</p>
+    <div class="settings-grid">
+      <div class="sg-item sg-wide"><label>Shell repair — site (WLD MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.siteMH.shellRepair.WLD"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Shell repair — site (FTR MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.siteMH.shellRepair.FTR"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Shell repair — site (RIG MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.siteMH.shellRepair.RIG"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Bottom repair — site (WLD MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.siteMH.bottomRepair.WLD"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Bottom full replace — site (WLD MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.siteMH.bottomFullReplace.WLD"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Roof repair — site (WLD MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.siteMH.roofRepair.WLD"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>IFR add — site (WLD MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.siteMH.floatRoofAddIFR.WLD"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Float remove — site (RIG MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.siteMH.floatRoofRemove.RIG"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Rim seal — site (FTR MH/m)</label><input type="number" step="0.1" data-rate-path="CR.labour.siteMH.rimSealRR.FTR"><span class="sg-unit">MH/m</span></div>
+      <div class="sg-item sg-wide"><label>Stilling well — site (WLD MH/m)</label><input type="number" step="0.1" data-rate-path="CR.labour.siteMH.stillingWell.WLD"><span class="sg-unit">MH/m</span></div>
+      <div class="sg-item sg-wide"><label>CP anode install — site (FTR MH/ea)</label><input type="number" step="0.1" data-rate-path="CR.labour.siteMH.cpAnode.FTR"><span class="sg-unit">MH/ea</span></div>
+      <div class="sg-item sg-wide"><label>Vent install — site (WLD MH/ea)</label><input type="number" step="0.1" data-rate-path="CR.labour.siteMH.ventInstall.WLD"><span class="sg-unit">MH/ea</span></div>
+      <div class="sg-item sg-wide"><label>Wind girder — site (WLD MH/t)</label><input type="number" step="0.5" data-rate-path="CR.labour.siteMH.windGirder.WLD"><span class="sg-unit">MH/t</span></div>
+      <div class="sg-item sg-wide"><label>Stair add — site (WLD MH/m H)</label><input type="number" step="0.5" data-rate-path="CR.labour.siteMH.stairAdd.WLD"><span class="sg-unit">MH/m</span></div>
+      <div class="sg-item sg-wide"><label>Platform add — site (WLD MH/m circ)</label><input type="number" step="0.5" data-rate-path="CR.labour.siteMH.platformAdd.WLD"><span class="sg-unit">MH/m</span></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;align-items:center;padding:20px 0 40px;">
+    <button id="btn-save-rates" class="btn btn-success" onclick="saveRates()">💾 Save Rates</button>
+    <button class="btn btn-secondary" onclick="exportRatesFile()">⬇ Export JS File</button>
+    <button class="btn btn-secondary" onclick="resetRates()">↺ Reset to Defaults</button>
+    <span style="font-size:12px;color:var(--text-muted);">Saved rates persist in this browser. Use Export as backup.</span>
+  </div>
+</main>
+</div>
+</div><!-- /settings-wrapper -->
+
 <div id="newbuild-wrapper" style="display:none;">
 <div id="app-body">
 
@@ -752,5 +935,23 @@
 
 <script src="js/output.js"></script>
 <script src="js/app.js"></script>
+<script>
+function openSettings() {
+  document.getElementById('landing-screen').style.display = 'none';
+  document.getElementById('newbuild-wrapper').style.display = 'none';
+  document.getElementById('repair-wrapper').style.display = 'none';
+  document.getElementById('settings-wrapper').style.display = 'block';
+  populateSettingsForm();
+}
+function closeSettings() {
+  document.getElementById('settings-wrapper').style.display = 'none';
+  document.getElementById('landing-screen').style.display = 'flex';
+}
+function resetRates() {
+  if (!confirm('Reset all rates to built-in defaults? This will clear your saved rates.')) return;
+  localStorage.removeItem('tankEstimator_costRates_v1');
+  location.reload();
+}
+</script>
 </body>
 </html>
